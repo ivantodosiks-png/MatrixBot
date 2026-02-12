@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
-import { dbQuery } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
+import { findUserByEmail } from "@/lib/user-store";
 
 export const runtime = "nodejs";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
 }
-
-type UserRow = {
-  id: string;
-  name: string | null;
-  email: string;
-  password_hash: string;
-  created_at: string;
-};
 
 export async function POST(request: Request) {
   try {
@@ -33,17 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await dbQuery<UserRow>(
-      `
-      SELECT id, name, email, password_hash, created_at
-      FROM users
-      WHERE email = $1
-      LIMIT 1
-      `,
-      [email]
-    );
-
-    const user = result.rows[0];
+    const user = await findUserByEmail(email);
     if (!user) {
       return NextResponse.json(
         { ok: false, error: "invalid email or password" },
@@ -75,4 +57,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

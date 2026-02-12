@@ -1,14 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { dbQuery } from "@/lib/db";
 import { verifyPassword } from "@/lib/password";
-
-type UserRow = {
-  id: string;
-  email: string;
-  name: string | null;
-  password_hash: string;
-};
+import { findUserByEmail } from "@/lib/user-store";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -30,11 +23,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!email || !password) return null;
 
-        const result = await dbQuery<UserRow>(
-          `SELECT id, email, name, password_hash FROM users WHERE email = $1 LIMIT 1`,
-          [email]
-        );
-        const user = result.rows[0];
+        const user = await findUserByEmail(email);
         if (!user) return null;
 
         const ok = await verifyPassword(password, user.password_hash);
@@ -64,4 +53,3 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
-

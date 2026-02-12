@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import BodyClass from "@/components/body-class";
 
 type RegisterResponse = {
@@ -40,10 +41,16 @@ export default function RegisterPage() {
     setStatus("Creating account...");
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const normalizedName = name.trim();
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({
+          name: normalizedName,
+          email: normalizedEmail,
+          password,
+        }),
       });
 
       const data = (await response.json().catch(() => ({}))) as RegisterResponse;
@@ -52,9 +59,21 @@ export default function RegisterPage() {
         throw new Error(data.error || `HTTP ${response.status}`);
       }
 
+      const signInResult = await signIn("credentials", {
+        email: normalizedEmail,
+        password,
+        redirect: false,
+      });
+      if (!signInResult || signInResult.error) {
+        throw new Error(
+          signInResult?.error ||
+            "account was created, but automatic login failed"
+        );
+      }
+
       localStorage.setItem(
         "matrix_user",
-        JSON.stringify(data.user || { name: name.trim(), email: email.trim() })
+        JSON.stringify(data.user || { name: normalizedName, email: normalizedEmail })
       );
       setState("success");
       setStatus("Account created. Redirecting...");

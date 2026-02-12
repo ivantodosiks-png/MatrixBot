@@ -3,17 +3,8 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import BodyClass from "@/components/body-class";
-
-type LoginResponse = {
-  ok?: boolean;
-  error?: string;
-  user?: {
-    id?: string;
-    name?: string | null;
-    email?: string;
-  };
-};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -39,19 +30,29 @@ export default function LoginPage() {
     setStatus("Checking credentials...");
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const normalizedEmail = email.trim().toLowerCase();
+      const signInResult = await signIn("credentials", {
+        email: normalizedEmail,
+        password,
+        redirect: false,
       });
-
-      const data = (await response.json().catch(() => ({}))) as LoginResponse;
-
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || `HTTP ${response.status}`);
+      if (!signInResult || signInResult.error) {
+        throw new Error(signInResult?.error || "invalid email or password");
       }
 
-      localStorage.setItem("matrix_user", JSON.stringify(data.user || { email }));
+      const sessionRes = await fetch("/api/auth/session", { cache: "no-store" });
+      const session = (await sessionRes.json().catch(() => ({}))) as {
+        user?: { id?: string; name?: string | null; email?: string | null };
+      };
+
+      localStorage.setItem(
+        "matrix_user",
+        JSON.stringify({
+          id: session.user?.id,
+          name: session.user?.name || undefined,
+          email: session.user?.email || normalizedEmail,
+        })
+      );
       setState("success");
       setStatus("Login successful. Redirecting...");
       router.push("/chat");

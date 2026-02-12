@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { dbQuery } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { createUser } from "@/lib/user-store";
 
 export const runtime = "nodejs";
 
@@ -11,13 +11,6 @@ function normalizeEmail(email: string) {
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
-
-type InsertedUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  created_at: string;
-};
 
 export async function POST(request: Request) {
   try {
@@ -54,19 +47,17 @@ export async function POST(request: Request) {
 
     const passwordHash = await hashPassword(password);
 
-    const result = await dbQuery<InsertedUser>(
-      `
-      INSERT INTO users (name, email, password_hash)
-      VALUES ($1, $2, $3)
-      RETURNING id, name, email, created_at
-      `,
-      [name, email, passwordHash]
-    );
+    const user = await createUser({ name, email, passwordHash });
 
     return NextResponse.json(
       {
         ok: true,
-        user: result.rows[0],
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          created_at: user.created_at,
+        },
       },
       { status: 201 }
     );
@@ -89,4 +80,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
