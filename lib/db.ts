@@ -88,6 +88,9 @@ async function createPool() {
       );
       const usersTable = probe.rows[0]?.users_table ?? null;
       if (usersTable) {
+        console.info(
+          `[db] Connected via ${candidate.key} to database "${probe.rows[0]?.current_database}". public.users found.`
+        );
         return pool;
       }
       if (!firstConnectedPool) {
