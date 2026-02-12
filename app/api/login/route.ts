@@ -50,7 +50,37 @@ export async function POST(request: Request) {
         created_at: user.created_at,
       },
     });
-  } catch {
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code?: string }).code === "MATRIX_DB_UNAVAILABLE"
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "login service is temporarily unavailable (database connection issue)",
+        },
+        { status: 503 }
+      );
+    }
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code?: string }).code === "42P01"
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'database setup error: relation "users" does not exist',
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json(
       { ok: false, error: "login failed" },
       { status: 500 }

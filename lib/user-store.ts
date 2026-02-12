@@ -22,6 +22,21 @@ declare global {
   var __matrixLocalUsers: UserRecord[] | undefined;
 }
 
+function isLocalFallbackEnabled() {
+  const explicit = String(process.env.MATRIX_ALLOW_LOCAL_USER_FALLBACK ?? "")
+    .trim()
+    .toLowerCase();
+  if (["1", "true", "yes", "on"].includes(explicit)) {
+    return true;
+  }
+  if (["0", "false", "no", "off"].includes(explicit)) {
+    return false;
+  }
+
+  // Safe default: enable fallback only in local dev.
+  return process.env.NODE_ENV !== "production" && !process.env.VERCEL;
+}
+
 function getFallbackUsersFile() {
   const explicitPath = process.env.MATRIX_USER_STORE_FILE;
   if (explicitPath) return explicitPath;
@@ -43,6 +58,14 @@ function createEmailExistsError() {
   return error;
 }
 
+function createDbUnavailableError() {
+  const error = new Error("database is unavailable") as Error & {
+    code?: string;
+  };
+  error.code = "MATRIX_DB_UNAVAILABLE";
+  return error;
+}
+
 function isReadonlyFsError(error: unknown) {
   if (!(error instanceof Error)) return false;
   const code = (error as Error & { code?: string }).code;
@@ -59,8 +82,6 @@ function isDbUnavailableError(error: unknown) {
       "ECONNREFUSED",
       "ENOTFOUND",
       "EHOSTUNREACH",
-      "42P01",
-      "3D000",
     ].includes(code)
   ) {
     return true;
@@ -69,8 +90,7 @@ function isDbUnavailableError(error: unknown) {
   return (
     message.includes("timeout") ||
     message.includes("failed to connect") ||
-    message.includes("database_url is not set") ||
-    message.includes('relation "users" does not exist')
+    message.includes("database_url is not set")
   );
 }
 
@@ -124,6 +144,9 @@ export async function findUserByEmail(emailInput: string): Promise<UserRecord | 
     if (!isDbUnavailableError(error)) {
       throw error;
     }
+    if (!isLocalFallbackEnabled()) {
+      throw createDbUnavailableError();
+    }
   }
 
   const fallbackUsers = await readFallbackUsers();
@@ -158,6 +181,9 @@ export async function createUser(input: CreateUserInput): Promise<UserRecord> {
     }
     if (!isDbUnavailableError(error)) {
       throw error;
+    }
+    if (!isLocalFallbackEnabled()) {
+      throw createDbUnavailableError();
     }
   }
 
