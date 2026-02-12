@@ -47,11 +47,6 @@ export default function HomePage() {
               Premium AI workspace with secure flows, low-friction UX, and a
               clean neon visual system built for modern teams.
             </p>
-            <div className="lp-signal-row">
-              <span>School-safe workflows</span>
-              <span>Server-side key routing</span>
-              <span>Fast response loops</span>
-            </div>
             <div className="lp-hero-cta">
               <a className="lp-btn lp-btn-primary" href="/chat">
                 Start session

@@ -13,7 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="ambient-layer ambient-particles" aria-hidden="true" />
+        <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
+        <div className="ambient-layer ambient-rain" aria-hidden="true" />
+        {children}
+      </body>
     </html>
   );
 }

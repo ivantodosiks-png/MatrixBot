@@ -63,6 +63,56 @@ body.matrix::after {
   z-index: 0;
 }
 
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+}
+
+body.matrix .ambient-layer {
+  opacity: 1;
+}
+
+.ambient-particles {
+  background-image:
+    radial-gradient(circle at 9% 18%, rgba(173, 236, 255, 0.42) 0 1px, transparent 2px),
+    radial-gradient(circle at 27% 44%, rgba(140, 228, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle at 46% 20%, rgba(156, 230, 255, 0.34) 0 1px, transparent 2px),
+    radial-gradient(circle at 64% 38%, rgba(146, 241, 213, 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 27%, rgba(138, 214, 255, 0.36) 0 1px, transparent 2px),
+    radial-gradient(circle at 92% 58%, rgba(133, 225, 255, 0.3) 0 1px, transparent 2px),
+    radial-gradient(circle at 18% 78%, rgba(133, 225, 255, 0.28) 0 1px, transparent 2px),
+    radial-gradient(circle at 73% 82%, rgba(146, 241, 213, 0.26) 0 1px, transparent 2px);
+  opacity: 0.14;
+  animation: ambient-particles-float 36s linear infinite alternate;
+}
+
+.ambient-glowdots {
+  background:
+    radial-gradient(12px 12px at 14% 26%, rgba(133, 225, 255, 0.22), transparent 70%),
+    radial-gradient(10px 10px at 34% 66%, rgba(146, 241, 213, 0.18), transparent 70%),
+    radial-gradient(14px 14px at 58% 18%, rgba(125, 209, 255, 0.2), transparent 72%),
+    radial-gradient(11px 11px at 78% 52%, rgba(153, 230, 255, 0.16), transparent 72%),
+    radial-gradient(10px 10px at 88% 80%, rgba(146, 241, 213, 0.16), transparent 72%);
+  filter: blur(0.2px);
+  opacity: 0.16;
+  animation: ambient-glow-pulse 12s ease-in-out infinite;
+}
+
+.ambient-rain {
+  inset: -180% 0 0 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(98, 234, 255, 0) 0 11px,
+    rgba(98, 234, 255, 0.07) 11px 12px,
+    rgba(98, 234, 255, 0) 12px 26px
+  );
+  opacity: 0;
+  animation: ambient-rain-cycle 34s linear infinite;
+}
+
 .bg-grid {
   position: fixed;
   inset: 0;
@@ -81,19 +131,42 @@ body.matrix::after {
   inset: -200% 0 0 0;
   background: repeating-linear-gradient(
     180deg,
-    rgba(98, 234, 255, 0.0) 0 8px,
-    rgba(98, 234, 255, 0.08) 8px 10px,
-    rgba(98, 234, 255, 0.0) 10px 20px
+    rgba(98, 234, 255, 0.0) 0 9px,
+    rgba(98, 234, 255, 0.06) 9px 10px,
+    rgba(98, 234, 255, 0.0) 10px 24px
   );
-  animation: rain 11s linear infinite;
-  opacity: 0.2;
+  animation: rain 24s linear infinite;
+  opacity: 0.08;
   pointer-events: none;
   z-index: 0;
 }
 
 @keyframes rain {
-  0% { transform: translateY(-40%); }
-  100% { transform: translateY(40%); }
+  0% { transform: translateY(-46%); opacity: 0; }
+  14% { opacity: 0.08; }
+  24% { opacity: 0; }
+  68% { opacity: 0; }
+  78% { opacity: 0.1; }
+  88% { opacity: 0; }
+  100% { transform: translateY(46%); opacity: 0; }
+}
+
+@keyframes ambient-particles-float {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(0, -14px, 0); }
+}
+
+@keyframes ambient-glow-pulse {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes ambient-rain-cycle {
+  0% { transform: translateY(-44%); opacity: 0; }
+  72% { opacity: 0; }
+  78% { opacity: 0.08; }
+  86% { opacity: 0; }
+  100% { transform: translateY(44%); opacity: 0; }
 }
 
 @keyframes bg-shift {
@@ -1282,7 +1355,6 @@ body.auth-page {
   top: 0;
   z-index: 1200;
   padding: 16px 0;
-  backdrop-filter: blur(10px);
 }
 
 .lp-header .lp-shell {
@@ -1347,6 +1419,18 @@ body.auth-page {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.lp-hero-cta {
+  margin-top: 12px;
+}
+
+.lp-final-cta .lp-btn {
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  min-width: 126px;
+  flex: 0 0 auto;
 }
 
 .lp-btn {
@@ -1449,7 +1533,7 @@ body.auth-page {
 }
 
 .lp-lead {
-  margin: 16px 0 0;
+  margin: 10px 0 0;
   max-width: 56ch;
   font-family: "Sora", "Inter", sans-serif;
   font-size: 1.05rem;
@@ -1807,6 +1891,7 @@ body.auth-page {
   .lp-card,
   .lp-step,
   .lp-line .pulse,
+  .ambient-layer,
   .lp-aurora i,
   .lp-band-track,
   .lp-band-marquee,
@@ -1950,29 +2035,6 @@ select {
   text-transform: uppercase;
 }
 
-.lp-signal-row {
-  margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-  max-width: 680px;
-}
-
-.lp-signal-row span {
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  color: #d0e5ff;
-  border: 1px solid rgba(124, 197, 255, 0.42);
-  background: rgba(20, 35, 57, 0.62);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  white-space: nowrap;
-  max-width: 100%;
-}
 
 .lp-band {
   position: relative;
@@ -2197,12 +2259,6 @@ select {
   .lp-step,
   .lp-showcase-card {
     animation-duration: 7s;
-  }
-  .lp-signal-row { gap: 8px; }
-  .lp-signal-row span {
-    flex: 1 1 100%;
-    white-space: normal;
-    overflow-wrap: anywhere;
   }
 }
 
