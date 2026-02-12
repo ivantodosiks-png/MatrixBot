@@ -11,6 +11,19 @@ export default function ChatPage() {
       <div className="bg-rain" aria-hidden="true" />
 
       <div className="app">
+        <div className="chat-loader" id="chatLoader" aria-live="polite">
+          <div className="chat-loader-panel">
+            <div className="chat-loader-title">Initializing matrix chat</div>
+            <div className="chat-loader-line" />
+            <div className="chat-loader-line short" />
+            <div className="chat-loader-dots">
+              <i />
+              <i />
+              <i />
+            </div>
+          </div>
+        </div>
+
         <aside className="sidebar" id="sidebar">
           <div className="sidebar-header">
             <div className="brand">MATRIX GPT</div>

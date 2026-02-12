@@ -29,6 +29,8 @@
 
   items.forEach((el, index) => {
     el.style.transitionDelay = `${Math.min(index * 35, 210)}ms`;
+    el.style.transitionDuration = '680ms';
+    el.style.transitionTimingFunction = 'cubic-bezier(0.2, 0.7, 0.25, 1)';
     observer.observe(el);
   });
 

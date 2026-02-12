@@ -29,10 +29,27 @@ const userEmailEl = document.getElementById('userEmail');
 const userAvatarEl = document.getElementById('userAvatar');
 const logoutBtn = document.getElementById('logoutBtn');
 const apiStatusEl = document.getElementById('apiStatus');
+const chatLoaderEl = document.getElementById('chatLoader');
 
 let currentChatId = null;
 let chats = loadChats();
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let chatLoaderHidden = false;
+
+function hideChatLoader() {
+  if (!chatLoaderEl || chatLoaderHidden) return;
+  chatLoaderHidden = true;
+
+  if (prefersReducedMotion) {
+    chatLoaderEl.remove();
+    return;
+  }
+
+  chatLoaderEl.classList.add('is-hidden');
+  window.setTimeout(() => {
+    chatLoaderEl.remove();
+  }, 460);
+}
 
 function scrollMessagesToBottom(forceInstant = false) {
   if (!messagesEl) return;
@@ -388,3 +405,4 @@ logoutBtn?.addEventListener('click', () => {
 updateUserInfo();
 updateApiStatus();
 ensureInitialChat();
+window.setTimeout(hideChatLoader, 360);
