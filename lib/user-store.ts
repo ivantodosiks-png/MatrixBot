@@ -17,11 +17,21 @@ type CreateUserInput = {
   passwordHash: string;
 };
 
-const FALLBACK_USERS_FILE = path.join(
-  process.cwd(),
-  ".data",
-  "users.local.json"
-);
+declare global {
+  // In-memory emergency fallback for readonly/serverless filesystems.
+  var __matrixLocalUsers: UserRecord[] | undefined;
+}
+
+function getFallbackUsersFile() {
+  const explicitPath = process.env.MATRIX_USER_STORE_FILE;
+  if (explicitPath) return explicitPath;
+
+  if (process.env.VERCEL) {
+    return path.join("/tmp", "matrix-ui", "users.local.json");
+  }
+
+  return path.join(process.cwd(), ".data", "users.local.json");
+}
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
@@ -31,6 +41,12 @@ function createEmailExistsError() {
   const error = new Error("email already exists") as Error & { code?: string };
   error.code = "23505";
   return error;
+}
+
+function isReadonlyFsError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const code = (error as Error & { code?: string }).code;
+  return Boolean(code && ["EROFS", "EPERM", "EACCES", "ENOENT"].includes(code));
 }
 
 function isDbUnavailableError(error: unknown) {
@@ -59,22 +75,34 @@ function isDbUnavailableError(error: unknown) {
 }
 
 async function readFallbackUsers(): Promise<UserRecord[]> {
+  const fallbackUsersFile = getFallbackUsersFile();
   try {
-    const raw = await readFile(FALLBACK_USERS_FILE, "utf8");
+    const raw = await readFile(fallbackUsersFile, "utf8");
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed as UserRecord[];
-  } catch {
+  } catch (error) {
+    if (isReadonlyFsError(error)) {
+      return global.__matrixLocalUsers ?? [];
+    }
     return [];
   }
 }
 
 async function writeFallbackUsers(users: UserRecord[]) {
-  const folder = path.dirname(FALLBACK_USERS_FILE);
-  await mkdir(folder, { recursive: true });
-  const tmpFile = `${FALLBACK_USERS_FILE}.tmp`;
-  await writeFile(tmpFile, JSON.stringify(users, null, 2), "utf8");
-  await rename(tmpFile, FALLBACK_USERS_FILE);
+  const fallbackUsersFile = getFallbackUsersFile();
+  const folder = path.dirname(fallbackUsersFile);
+  try {
+    await mkdir(folder, { recursive: true });
+    const tmpFile = `${fallbackUsersFile}.tmp`;
+    await writeFile(tmpFile, JSON.stringify(users, null, 2), "utf8");
+    await rename(tmpFile, fallbackUsersFile);
+  } catch (error) {
+    if (!isReadonlyFsError(error)) {
+      throw error;
+    }
+    global.__matrixLocalUsers = [...users];
+  }
 }
 
 export async function findUserByEmail(emailInput: string): Promise<UserRecord | null> {
