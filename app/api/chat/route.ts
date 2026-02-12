@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "node:crypto";
 
 export const runtime = "nodejs";
 
@@ -23,14 +24,21 @@ function normalizeEnvSecret(value: string) {
   if (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length > 1) {
     return trimmed.slice(1, -1).trim();
   }
-  return trimmed;
+  return trimmed.replace(/\s+/g, "");
 }
 
 export async function POST(request: Request) {
-  const apiKey = normalizeEnvSecret(String(process.env.OPENAI_API_KEY ?? ""));
+  const apiKey = normalizeEnvSecret(
+    String(process.env.OPENAI_API_KEY ?? process.env.OPENAI_KEY ?? "")
+  );
   if (!apiKey) {
     return NextResponse.json(
-      { error: { message: "OPENAI_API_KEY is missing in environment" } },
+      {
+        error: {
+          message: "OPENAI_API_KEY is missing in environment",
+          hint: "Set OPENAI_API_KEY in Vercel Project Settings for Production",
+        },
+      },
       { status: 500 }
     );
   }
@@ -40,6 +48,17 @@ export async function POST(request: Request) {
         error: {
           message:
             "OPENAI_API_KEY looks masked (contains *). Set the full real key in environment variables.",
+        },
+      },
+      { status: 500 }
+    );
+  }
+  if (!apiKey.startsWith("sk-")) {
+    return NextResponse.json(
+      {
+        error: {
+          message:
+            "OPENAI_API_KEY has invalid format (must start with sk-)",
         },
       },
       { status: 500 }
@@ -93,6 +112,15 @@ export async function POST(request: Request) {
   };
 
   try {
+    const keyFingerprint = crypto
+      .createHash("sha256")
+      .update(apiKey)
+      .digest("hex")
+      .slice(0, 12);
+    console.info(
+      `[chat-api] key_fingerprint=${keyFingerprint} key_len=${apiKey.length}`
+    );
+
     const upstream = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {
@@ -114,6 +142,19 @@ export async function POST(request: Request) {
       }
 
       if (!upstream.ok && parsed && typeof parsed === "object" && "error" in parsed) {
+        const upstreamError = (parsed as { error?: { code?: string; message?: string } }).error;
+        if (upstream.status === 401 && upstreamError?.code === "invalid_api_key") {
+          return NextResponse.json(
+            {
+              error: {
+                message: "OpenAI rejected server API key (invalid_api_key)",
+                hint:
+                  "Update OPENAI_API_KEY in Vercel Production env and redeploy. Also verify you are hitting latest deployment.",
+              },
+            },
+            { status: 401 }
+          );
+        }
         return NextResponse.json(parsed, { status: upstream.status });
       }
 

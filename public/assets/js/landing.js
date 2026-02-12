@@ -31,4 +31,28 @@
     el.style.transitionDelay = `${Math.min(index * 35, 210)}ms`;
     observer.observe(el);
   });
+
+  const tiltTargets = Array.from(
+    document.querySelectorAll('.lp-terminal, .lp-showcase-card')
+  );
+
+  function resetTilt(el) {
+    el.style.transform = '';
+  }
+
+  if (!prefersReduced && tiltTargets.length) {
+    tiltTargets.forEach((el) => {
+      el.addEventListener('mousemove', (event) => {
+        const rect = el.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width;
+        const py = (event.clientY - rect.top) / rect.height;
+        const rotateY = (px - 0.5) * 6;
+        const rotateX = (0.5 - py) * 5;
+        el.style.transform = `perspective(900px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+      });
+
+      el.addEventListener('mouseleave', () => resetTilt(el));
+      el.addEventListener('blur', () => resetTilt(el));
+    });
+  }
 })();

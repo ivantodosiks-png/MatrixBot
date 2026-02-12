@@ -34,6 +34,21 @@ export default function ChatPage() {
             </button>
           </div>
 
+          <div className="status-card">
+            <div className="status-row">
+              <span>Session</span>
+              <span>secured</span>
+            </div>
+            <div className="status-row">
+              <span>Model</span>
+              <span>gpt-4o-mini</span>
+            </div>
+            <div className="status-row">
+              <span>API</span>
+              <span id="apiStatus">checking...</span>
+            </div>
+          </div>
+
           <div className="menu-section">
             <div className="section-title">Samtaler</div>
             <div className="chat-list" id="chatList" />

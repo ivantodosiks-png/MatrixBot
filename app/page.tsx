@@ -10,6 +10,11 @@ export default function HomePage() {
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-rain" aria-hidden="true" />
       <div className="bg-noise" aria-hidden="true" />
+      <div className="lp-aurora" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
 
       <header className="lp-header">
         <div className="lp-shell">
@@ -22,6 +27,7 @@ export default function HomePage() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="lp-header-cta">
+            <span className="lp-online-pill">Core online</span>
             <a href="/login" className="lp-btn lp-btn-secondary">
               Logg inn
             </a>
@@ -41,6 +47,11 @@ export default function HomePage() {
               Premium AI workspace with secure flows, low-friction UX, and a
               clean neon visual system built for modern teams.
             </p>
+            <div className="lp-signal-row">
+              <span>School-safe workflows</span>
+              <span>Server-side key routing</span>
+              <span>Fast response loops</span>
+            </div>
             <div className="lp-hero-cta">
               <a className="lp-btn lp-btn-primary" href="/chat">
                 Start session
@@ -100,6 +111,25 @@ export default function HomePage() {
           </aside>
         </section>
 
+        <section className="lp-band">
+          <div className="lp-shell lp-band-marquee">
+            <div className="lp-band-track">
+              <span>LIVE CONTEXT</span>
+              <span>TEAM-READY UX</span>
+              <span>LOW LATENCY FLOW</span>
+              <span>SECURE BY DEFAULT</span>
+              <span>NEON CONTROL PANEL</span>
+            </div>
+            <div className="lp-band-track" aria-hidden="true">
+              <span>LIVE CONTEXT</span>
+              <span>TEAM-READY UX</span>
+              <span>LOW LATENCY FLOW</span>
+              <span>SECURE BY DEFAULT</span>
+              <span>NEON CONTROL PANEL</span>
+            </div>
+          </div>
+        </section>
+
         <section id="features" className="lp-section lp-shell">
           <div className="lp-section-top reveal-on-scroll">
             <p className="lp-eyebrow">ADVANTAGES</p>
@@ -147,6 +177,37 @@ export default function HomePage() {
                 Layouts and controls adapt smoothly from desktop workspace to
                 phone.
               </p>
+            </article>
+          </div>
+        </section>
+
+        <section className="lp-shell lp-showcase">
+          <article className="lp-showcase-main reveal-on-scroll">
+            <p className="lp-eyebrow">COMMAND CENTER</p>
+            <h2>One clean workspace for messages, context, and execution.</h2>
+            <p>
+              Keep every thread in one place. Launch a new chat, continue old
+              sessions, and maintain decision context without switching tools.
+            </p>
+            <a href="/chat" className="lp-btn lp-btn-primary">
+              Enter command center
+            </a>
+          </article>
+          <div className="lp-showcase-grid">
+            <article className="lp-showcase-card reveal-on-scroll">
+              <strong>01</strong>
+              <h3>Structured prompts</h3>
+              <p>Use reusable system prompts and stay consistent across chats.</p>
+            </article>
+            <article className="lp-showcase-card reveal-on-scroll">
+              <strong>02</strong>
+              <h3>Instant routing</h3>
+              <p>Request flow goes through backend proxy with server-side secrets.</p>
+            </article>
+            <article className="lp-showcase-card reveal-on-scroll">
+              <strong>03</strong>
+              <h3>Focused output</h3>
+              <p>Balanced typography and spacing keep eyes on the answer, not noise.</p>
             </article>
           </div>
         </section>

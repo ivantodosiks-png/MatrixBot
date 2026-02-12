@@ -32,6 +32,17 @@ const apiStatusEl = document.getElementById('apiStatus');
 
 let currentChatId = null;
 let chats = loadChats();
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function scrollMessagesToBottom(forceInstant = false) {
+  if (!messagesEl) return;
+  const top = messagesEl.scrollHeight;
+  if (forceInstant || prefersReducedMotion) {
+    messagesEl.scrollTop = top;
+    return;
+  }
+  messagesEl.scrollTo({ top, behavior: 'smooth' });
+}
 
 function loadChats() {
   try {
@@ -54,17 +65,50 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;');
 }
 
-function appendMessage(role, content) {
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  div.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
-  messagesEl.appendChild(div);
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+function formatTime(ts) {
+  try {
+    return new Date(ts).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch {
+    return '';
+  }
+}
+
+function appendMessage(role, content, ts = Date.now()) {
+  const safeRole = role === 'user' ? 'user' : 'assistant';
+
+  const row = document.createElement('article');
+  row.className = `msg-row ${safeRole}`;
+
+  const bubble = document.createElement('div');
+  bubble.className = `msg ${safeRole}`;
+
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = safeRole === 'user' ? 'You' : 'Matrix';
+
+  const body = document.createElement('div');
+  body.className = 'msg-content';
+  body.innerHTML = escapeHtml(content).replace(/\n/g, '<br>');
+
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  meta.textContent = formatTime(ts);
+
+  bubble.appendChild(label);
+  bubble.appendChild(body);
+  bubble.appendChild(meta);
+  row.appendChild(bubble);
+  messagesEl.appendChild(row);
+  scrollMessagesToBottom();
 }
 
 function renderMessages(items) {
   messagesEl.innerHTML = '';
-  items.forEach(m => appendMessage(m.role, m.content));
+  items.forEach(m => appendMessage(m.role, m.content, m.ts));
+  scrollMessagesToBottom(true);
 }
 
 function formatDate(ts) {
@@ -298,7 +342,7 @@ async function sendMessage() {
 
   saveChats();
   chatTitleEl.textContent = chat.title;
-  appendMessage('user', text);
+  appendMessage('user', text, userMessage.ts);
   renderChatList();
 
   typingEl.hidden = false;
@@ -310,11 +354,11 @@ async function sendMessage() {
     chat.messages.push(assistantMessage);
     chat.updatedAt = Date.now();
     saveChats();
-    appendMessage('assistant', reply);
+    appendMessage('assistant', reply, assistantMessage.ts);
     renderChatList();
   } catch (err) {
     const msg = err && err.message ? err.message : 'Feil ved forespørsel.';
-    appendMessage('assistant', `Feil: ${msg}`);
+    appendMessage('assistant', `Feil: ${msg}`, Date.now());
   } finally {
     typingEl.hidden = true;
   }
