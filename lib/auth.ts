@@ -1,10 +1,27 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import crypto from "node:crypto";
 import { verifyPassword } from "@/lib/password";
 import { findUserByEmail } from "@/lib/user-store";
 
 function normalizeEmail(email: string) {
   return email.trim().toLowerCase();
+}
+
+function resolveAuthSecret() {
+  const envSecret =
+    process.env.NEXTAUTH_SECRET ||
+    process.env.AUTH_SECRET ||
+    process.env.NEXT_AUTH_SECRET;
+  if (envSecret) return envSecret;
+
+  const seed =
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ||
+    process.env.VERCEL_URL ||
+    process.env.NEXTAUTH_URL ||
+    "matrix-ui-local-dev-fallback";
+
+  return crypto.createHash("sha256").update(seed).digest("hex");
 }
 
 export const authOptions: NextAuthOptions = {
@@ -51,5 +68,5 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: resolveAuthSecret(),
 };
