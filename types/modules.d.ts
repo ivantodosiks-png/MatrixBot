@@ -1,0 +1,20 @@
+declare module "pg" {
+  export class Pool {
+    constructor(config?: unknown);
+    query<T = unknown>(
+      text: string,
+      params?: unknown[]
+    ): Promise<{ rows: T[] }>;
+  }
+}
+
+declare module "bcrypt" {
+  export function hash(
+    data: string | Buffer,
+    saltOrRounds: string | number
+  ): Promise<string>;
+  export function compare(
+    data: string | Buffer,
+    encrypted: string
+  ): Promise<boolean>;
+}
