@@ -133,7 +133,7 @@ export async function findUserByEmail(emailInput: string): Promise<UserRecord | 
     const result = await dbQuery<UserRecord>(
       `
       SELECT id, name, email, password_hash, created_at
-      FROM users
+      FROM public.users
       WHERE email = $1
       LIMIT 1
       `,
@@ -163,7 +163,7 @@ export async function createUser(input: CreateUserInput): Promise<UserRecord> {
   try {
     const result = await dbQuery<UserRecord>(
       `
-      INSERT INTO users (name, email, password_hash)
+      INSERT INTO public.users (name, email, password_hash)
       VALUES ($1, $2, $3)
       RETURNING id, name, email, password_hash, created_at
       `,
