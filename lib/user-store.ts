@@ -66,6 +66,17 @@ function createDbUnavailableError() {
   return error;
 }
 
+function isUsersTableMissingError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const code = (error as Error & { code?: string }).code;
+  if (code === "42P01") return true;
+  const message = error.message.toLowerCase();
+  return (
+    message.includes('relation "users" does not exist') ||
+    message.includes('relation "public.users" does not exist')
+  );
+}
+
 function isReadonlyFsError(error: unknown) {
   if (!(error instanceof Error)) return false;
   const code = (error as Error & { code?: string }).code;
@@ -125,12 +136,31 @@ async function writeFallbackUsers(users: UserRecord[]) {
   }
 }
 
+async function ensureUsersTableExists() {
+  await dbQuery(
+    `
+    CREATE TABLE IF NOT EXISTS public.users (
+      id UUID PRIMARY KEY,
+      name TEXT,
+      email TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+    `
+  );
+  await dbQuery(
+    `
+    CREATE INDEX IF NOT EXISTS users_email_idx ON public.users (email)
+    `
+  );
+}
+
 export async function findUserByEmail(emailInput: string): Promise<UserRecord | null> {
   const email = normalizeEmail(emailInput);
   if (!email) return null;
 
-  try {
-    const result = await dbQuery<UserRecord>(
+  const selectUser = async () =>
+    dbQuery<UserRecord>(
       `
       SELECT id, name, email, password_hash, created_at
       FROM public.users
@@ -139,8 +169,16 @@ export async function findUserByEmail(emailInput: string): Promise<UserRecord | 
       `,
       [email]
     );
+
+  try {
+    const result = await selectUser();
     return result.rows[0] ?? null;
   } catch (error) {
+    if (isUsersTableMissingError(error)) {
+      await ensureUsersTableExists();
+      const result = await selectUser();
+      return result.rows[0] ?? null;
+    }
     if (!isDbUnavailableError(error)) {
       throw error;
     }
@@ -156,21 +194,30 @@ export async function findUserByEmail(emailInput: string): Promise<UserRecord | 
 export async function createUser(input: CreateUserInput): Promise<UserRecord> {
   const name = input.name.trim();
   const email = normalizeEmail(input.email);
+  const id = crypto.randomUUID();
   if (!name || !email) {
     throw new Error("name and email are required");
   }
 
-  try {
-    const result = await dbQuery<UserRecord>(
+  const insertUser = async (userId: string) =>
+    dbQuery<UserRecord>(
       `
-      INSERT INTO public.users (name, email, password_hash)
-      VALUES ($1, $2, $3)
+      INSERT INTO public.users (id, name, email, password_hash)
+      VALUES ($1, $2, $3, $4)
       RETURNING id, name, email, password_hash, created_at
       `,
-      [name, email, input.passwordHash]
+      [userId, name, email, input.passwordHash]
     );
+
+  try {
+    const result = await insertUser(id);
     return result.rows[0];
   } catch (error: unknown) {
+    if (isUsersTableMissingError(error)) {
+      await ensureUsersTableExists();
+      const result = await insertUser(id);
+      return result.rows[0];
+    }
     if (
       typeof error === "object" &&
       error !== null &&
