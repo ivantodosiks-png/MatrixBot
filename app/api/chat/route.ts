@@ -15,8 +15,19 @@ type ChatBody = {
   temperature?: number;
 };
 
+function normalizeEnvSecret(value: string) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"') && trimmed.length > 1) {
+    return trimmed.slice(1, -1).trim();
+  }
+  if (trimmed.startsWith("'") && trimmed.endsWith("'") && trimmed.length > 1) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
+}
+
 export async function POST(request: Request) {
-  const apiKey = String(process.env.OPENAI_API_KEY ?? "").trim();
+  const apiKey = normalizeEnvSecret(String(process.env.OPENAI_API_KEY ?? ""));
   if (!apiKey) {
     return NextResponse.json(
       { error: { message: "OPENAI_API_KEY is missing in environment" } },
