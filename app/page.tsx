@@ -87,7 +87,7 @@ export default function HomePage() {
               </div>
               <div className="lp-line">
                 <span className="ok" />
-                Model: gpt-4o-mini
+                Model: gpt-5.2
               </div>
               <div className="lp-line">
                 <span className="ok" />

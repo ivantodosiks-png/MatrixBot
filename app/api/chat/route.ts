@@ -6,7 +6,11 @@ export const runtime = "nodejs";
 const OPENAI_API_URL =
   process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const SYSTEM_PROMPT = String(process.env.SYSTEM_PROMPT ?? "").trim();
+const SYSTEM_PROMPT = String(
+  process.env.SYSTEM_PROMPT ??
+    "You are a helpful assistant. Reply concisely by default (2-5 sentences) unless the user asks for details."
+).trim();
+const DEFAULT_MAX_TOKENS = Number(process.env.MAX_TOKENS ?? 450);
 
 type ChatBody = {
   messages?: Array<{ role: string; content: string }>;
@@ -104,10 +108,17 @@ export async function POST(request: Request) {
       ? [{ role: "system", content: SYSTEM_PROMPT }, ...normalizedMessages]
       : normalizedMessages;
 
+  const requestedMaxTokens = Number.isFinite(max_tokens)
+    ? Number(max_tokens)
+    : Number(maxTokens);
+  const safeMaxTokens = Number.isFinite(requestedMaxTokens)
+    ? Math.max(64, Math.min(requestedMaxTokens, 700))
+    : Math.max(64, Math.min(DEFAULT_MAX_TOKENS, 700));
+
   const payload = {
     model: model || OPENAI_MODEL,
     messages: finalMessages,
-    max_tokens: Number.isFinite(max_tokens) ? max_tokens : maxTokens,
+    max_tokens: safeMaxTokens,
     temperature: Number.isFinite(temperature) ? temperature : 0.7,
   };
 

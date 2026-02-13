@@ -5,8 +5,8 @@ const DEFAULT_CONFIG = {
   apiUrl: '/api/chat',
   apiKey: '',
   model: 'gpt-4o-mini',
-  systemPrompt: 'Du er en hjelpsom skoleassistent. Svar kort og tydelig pa norsk (bokmal).',
-  maxTokens: 800,
+  systemPrompt: 'You are a helpful assistant. Reply concisely by default (2-5 sentences), match the user language, and expand only when the user asks for details.',
+  maxTokens: 450,
   temperature: 0.7
 };
 
@@ -34,7 +34,9 @@ const chatLoaderEl = document.getElementById('chatLoader');
 let currentChatId = null;
 let chats = loadChats();
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 let chatLoaderHidden = false;
+const smoothScrollStates = new WeakMap();
 
 function hideChatLoader() {
   if (!chatLoaderEl || chatLoaderHidden) return;
@@ -59,6 +61,48 @@ function scrollMessagesToBottom(forceInstant = false) {
     return;
   }
   messagesEl.scrollTo({ top, behavior: 'smooth' });
+}
+
+function smoothWheelScroll(element, deltaY) {
+  if (!element) return;
+
+  const maxTop = Math.max(0, element.scrollHeight - element.clientHeight);
+  if (maxTop <= 0) return;
+
+  const state = smoothScrollStates.get(element) || { target: element.scrollTop, rafId: 0 };
+  state.target = Math.max(0, Math.min(maxTop, state.target + deltaY));
+
+  if (state.rafId) {
+    smoothScrollStates.set(element, state);
+    return;
+  }
+
+  const tick = () => {
+    const distance = state.target - element.scrollTop;
+    if (Math.abs(distance) < 0.7) {
+      element.scrollTop = state.target;
+      state.rafId = 0;
+      smoothScrollStates.set(element, state);
+      return;
+    }
+
+    element.scrollTop += distance * 0.22;
+    state.rafId = requestAnimationFrame(tick);
+    smoothScrollStates.set(element, state);
+  };
+
+  state.rafId = requestAnimationFrame(tick);
+  smoothScrollStates.set(element, state);
+}
+
+function enableSmoothWheelScrolling(element) {
+  if (!element || prefersReducedMotion || !hasFinePointer) return;
+
+  element.addEventListener('wheel', (event) => {
+    if (element.scrollHeight <= element.clientHeight) return;
+    event.preventDefault();
+    smoothWheelScroll(element, event.deltaY);
+  }, { passive: false });
 }
 
 function loadChats() {
@@ -93,7 +137,7 @@ function formatTime(ts) {
   }
 }
 
-function appendMessage(role, content, ts = Date.now()) {
+function appendMessage(role, content, ts = Date.now(), options = { autoScroll: true }) {
   const safeRole = role === 'user' ? 'user' : 'assistant';
 
   const row = document.createElement('article');
@@ -119,12 +163,14 @@ function appendMessage(role, content, ts = Date.now()) {
   bubble.appendChild(meta);
   row.appendChild(bubble);
   messagesEl.appendChild(row);
-  scrollMessagesToBottom();
+  if (options.autoScroll !== false) {
+    scrollMessagesToBottom();
+  }
 }
 
 function renderMessages(items) {
   messagesEl.innerHTML = '';
-  items.forEach(m => appendMessage(m.role, m.content, m.ts));
+  items.forEach(m => appendMessage(m.role, m.content, m.ts, { autoScroll: false }));
   scrollMessagesToBottom(true);
 }
 
@@ -405,4 +451,6 @@ logoutBtn?.addEventListener('click', () => {
 updateUserInfo();
 updateApiStatus();
 ensureInitialChat();
+enableSmoothWheelScrolling(messagesEl);
+enableSmoothWheelScrolling(sidebarEl);
 window.setTimeout(hideChatLoader, 360);

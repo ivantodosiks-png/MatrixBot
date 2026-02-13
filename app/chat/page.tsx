@@ -85,7 +85,7 @@ export default function ChatPage() {
           <section className="messages" id="messages" />
 
           <div className="typing" id="typing" hidden>
-            Boten skriver...
+            Matrix skriver...
           </div>
 
           <footer className="composer">
