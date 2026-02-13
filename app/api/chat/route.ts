@@ -8,7 +8,7 @@ const OPENAI_API_URL =
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const SYSTEM_PROMPT = String(
   process.env.SYSTEM_PROMPT ??
-    "You are a helpful assistant. Reply concisely by default (2-5 sentences) unless the user asks for details."
+    "You are a helpful assistant. Reply in the same language as the user. Keep default replies short (1-3 concise paragraphs) unless the user asks for details."
 ).trim();
 const DEFAULT_MAX_TOKENS = Number(process.env.MAX_TOKENS ?? 450);
 

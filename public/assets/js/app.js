@@ -5,7 +5,7 @@ const DEFAULT_CONFIG = {
   apiUrl: '/api/chat',
   apiKey: '',
   model: 'gpt-4o-mini',
-  systemPrompt: 'You are a helpful assistant. Reply concisely by default (2-5 sentences), match the user language, and expand only when the user asks for details.',
+  systemPrompt: 'You are a helpful assistant. Reply in the same language as the user. Keep default replies short (1-3 concise paragraphs) unless the user asks for details.',
   maxTokens: 450,
   temperature: 0.7
 };
@@ -36,6 +36,9 @@ let chats = loadChats();
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 let chatLoaderHidden = false;
+let isSending = false;
+const AUTO_SCROLL_THRESHOLD_PX = 96;
+const TEXTAREA_MAX_HEIGHT_PX = 170;
 const smoothScrollStates = new WeakMap();
 
 function hideChatLoader() {
@@ -61,6 +64,27 @@ function scrollMessagesToBottom(forceInstant = false) {
     return;
   }
   messagesEl.scrollTo({ top, behavior: 'smooth' });
+}
+
+function isNearMessagesBottom() {
+  if (!messagesEl) return true;
+  const distanceToBottom = messagesEl.scrollHeight - (messagesEl.scrollTop + messagesEl.clientHeight);
+  return distanceToBottom <= AUTO_SCROLL_THRESHOLD_PX;
+}
+
+function resizeMessageInput() {
+  if (!inputEl) return;
+  inputEl.style.height = 'auto';
+  inputEl.style.height = `${Math.min(inputEl.scrollHeight, TEXTAREA_MAX_HEIGHT_PX)}px`;
+}
+
+function setSendingState(nextState) {
+  isSending = nextState;
+  if (sendBtn) {
+    sendBtn.disabled = nextState;
+    sendBtn.classList.toggle('is-loading', nextState);
+    sendBtn.setAttribute('aria-busy', String(nextState));
+  }
 }
 
 function smoothWheelScroll(element, deltaY) {
@@ -139,6 +163,7 @@ function formatTime(ts) {
 
 function appendMessage(role, content, ts = Date.now(), options = { autoScroll: true }) {
   const safeRole = role === 'user' ? 'user' : 'assistant';
+  const shouldAutoScroll = options.autoScroll !== false && (options.forceAutoScroll || isNearMessagesBottom());
 
   const row = document.createElement('article');
   row.className = `msg-row ${safeRole}`;
@@ -163,7 +188,7 @@ function appendMessage(role, content, ts = Date.now(), options = { autoScroll: t
   bubble.appendChild(meta);
   row.appendChild(bubble);
   messagesEl.appendChild(row);
-  if (options.autoScroll !== false) {
+  if (shouldAutoScroll) {
     scrollMessagesToBottom();
   }
 }
@@ -388,6 +413,7 @@ async function callModel(messages) {
 }
 
 async function sendMessage() {
+  if (isSending) return;
   const text = inputEl.value.trim();
   if (!text) return;
 
@@ -395,6 +421,7 @@ async function sendMessage() {
   if (!chat) return;
 
   inputEl.value = '';
+  resizeMessageInput();
   const userMessage = { role: 'user', content: text, ts: Date.now() };
   chat.messages.push(userMessage);
   chat.updatedAt = Date.now();
@@ -405,9 +432,10 @@ async function sendMessage() {
 
   saveChats();
   chatTitleEl.textContent = chat.title;
-  appendMessage('user', text, userMessage.ts);
+  appendMessage('user', text, userMessage.ts, { forceAutoScroll: true });
   renderChatList();
 
+  setSendingState(true);
   typingEl.hidden = false;
 
   try {
@@ -424,6 +452,8 @@ async function sendMessage() {
     appendMessage('assistant', `Feil: ${msg}`, Date.now());
   } finally {
     typingEl.hidden = true;
+    setSendingState(false);
+    inputEl?.focus();
   }
 }
 
@@ -436,6 +466,7 @@ inputEl?.addEventListener('keydown', (e) => {
     sendMessage();
   }
 });
+inputEl?.addEventListener('input', resizeMessageInput);
 
 if (toggleSidebarBtn) {
   toggleSidebarBtn.addEventListener('click', () => {
@@ -451,6 +482,7 @@ logoutBtn?.addEventListener('click', () => {
 updateUserInfo();
 updateApiStatus();
 ensureInitialChat();
+resizeMessageInput();
 enableSmoothWheelScrolling(messagesEl);
 enableSmoothWheelScrolling(sidebarEl);
 window.setTimeout(hideChatLoader, 360);
