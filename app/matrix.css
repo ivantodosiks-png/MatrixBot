@@ -161,8 +161,7 @@ body.matrix .ambient-layer {
   background:
     radial-gradient(60% 34% at 16% 12%, rgba(163, 237, 255, 0.12), rgba(163, 237, 255, 0)),
     radial-gradient(54% 28% at 84% 14%, rgba(136, 217, 255, 0.1), rgba(136, 217, 255, 0)),
-    radial-gradient(58% 36% at 54% 86%, rgba(128, 242, 255, 0.08), rgba(128, 242, 255, 0))
-  );
+    radial-gradient(58% 36% at 54% 86%, rgba(128, 242, 255, 0.08), rgba(128, 242, 255, 0));
   animation: rain 18s ease-in-out infinite;
   opacity: 0.15;
   pointer-events: none;
