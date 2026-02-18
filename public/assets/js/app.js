@@ -39,7 +39,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 const MATRIX_CHEAT_REGEX = /(^|[^a-z0-9])matrix([^a-z0-9]|$)/i;
 const MATRIX_REDIRECT_PATH = '/exit-matrix';
-const MATRIX_CHEAT_DURATION_MS = prefersReducedMotion ? 700 : 4200;
+const MATRIX_CHEAT_DURATION_MS = 9000;
 const MATRIX_COLUMN_CHARS = '0123456789';
 let chatLoaderHidden = false;
 let isSending = false;
@@ -106,7 +106,7 @@ function ensureMatrixCheatRain() {
     const column = document.createElement('span');
     column.className = 'matrix-cheat-column';
     column.style.left = `${(i / columns) * 100}%`;
-    column.style.setProperty('--matrix-fall-duration', `${(2.2 + Math.random() * 3).toFixed(2)}s`);
+    column.style.setProperty('--matrix-fall-duration', `${(4.8 + Math.random() * 2.8).toFixed(2)}s`);
     column.style.setProperty('--matrix-fall-delay', `${(-Math.random() * 3.8).toFixed(2)}s`);
     column.style.setProperty('--matrix-fall-opacity', (0.36 + Math.random() * 0.54).toFixed(2));
     column.style.setProperty('--matrix-fall-size', `${12 + Math.floor(Math.random() * 6)}px`);

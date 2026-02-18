@@ -2545,12 +2545,12 @@ body.chat-page.matrix-cheat-mode {
 }
 
 body.chat-page.matrix-cheat-mode .app {
-  animation: matrix-ui-melt 3.8s cubic-bezier(0.24, 0.78, 0.2, 1) forwards;
+  animation: matrix-ui-melt 8.6s cubic-bezier(0.24, 0.78, 0.2, 1) forwards;
 }
 
 body.chat-page.matrix-cheat-mode .bg-grid,
 body.chat-page.matrix-cheat-mode .bg-rain {
-  animation: matrix-bg-fade 3.8s ease forwards;
+  animation: matrix-bg-fade 8.6s ease forwards;
 }
 
 @keyframes matrix-fall {
@@ -2599,22 +2599,6 @@ body.chat-page.matrix-cheat-mode .bg-rain {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .chat-page .matrix-cheat-vignette,
-  .chat-page .matrix-cheat-column {
-    animation: none;
-  }
-
-  body.chat-page.matrix-cheat-mode .app,
-  body.chat-page.matrix-cheat-mode .bg-grid,
-  body.chat-page.matrix-cheat-mode .bg-rain {
-    animation: none;
-    filter: none;
-    transform: none;
-    opacity: 1;
-  }
-}
-
 /* Exit matrix page */
 body.matrix-exit-page {
   margin: 0;
@@ -2630,13 +2614,32 @@ body.matrix-exit-page {
 .matrix-exit-wrap {
   position: relative;
   z-index: 1;
-  width: min(680px, 92vw);
+  width: min(860px, 92vw);
   padding: clamp(24px, 5vw, 48px);
   border-radius: 18px;
   border: 1px solid rgba(119, 246, 166, 0.42);
   background: linear-gradient(160deg, rgba(6, 24, 16, 0.9), rgba(7, 30, 20, 0.86));
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.44), inset 0 0 0 1px rgba(119, 246, 166, 0.16);
   text-align: center;
+  display: grid;
+  gap: 12px;
+}
+
+.matrix-exit-visual {
+  width: min(620px, 86vw);
+  margin: 0 auto 8px;
+  border-radius: 16px;
+  border: 1px solid rgba(120, 250, 174, 0.34);
+  background: radial-gradient(circle at 50% 20%, rgba(34, 88, 58, 0.36), rgba(7, 23, 16, 0.72));
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35), 0 0 30px rgba(116, 252, 171, 0.14);
+  overflow: hidden;
+}
+
+.matrix-exit-visual img {
+  width: 100%;
+  height: auto;
+  display: block;
+  animation: matrix-exit-float 6s ease-in-out infinite;
 }
 
 .matrix-exit-kicker {
@@ -2666,6 +2669,16 @@ body.matrix-exit-page {
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@keyframes matrix-exit-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 

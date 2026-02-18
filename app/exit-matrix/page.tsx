@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
+import Image from "next/image";
 import BodyClass from "@/components/body-class";
 
 export default function ExitMatrixPage() {
@@ -10,6 +11,15 @@ export default function ExitMatrixPage() {
       <div className="bg-rain" aria-hidden="true" />
 
       <main className="matrix-exit-wrap">
+        <div className="matrix-exit-visual">
+          <Image
+            src="/assets/img/neo-matrix.svg"
+            alt="Neo in matrix code"
+            width={620}
+            height={760}
+            priority
+          />
+        </div>
         <p className="matrix-exit-kicker">SYSTEM MESSAGE</p>
         <h1 className="matrix-exit-title">
           {"\u0412\u044b \u0432\u044b\u0448\u043b\u0438 \u0438\u0437 \u043c\u0430\u0442\u0440\u0438\u0446\u044b"}
