@@ -30,13 +30,20 @@ const userAvatarEl = document.getElementById('userAvatar');
 const logoutBtn = document.getElementById('logoutBtn');
 const apiStatusEl = document.getElementById('apiStatus');
 const chatLoaderEl = document.getElementById('chatLoader');
+const matrixCheatOverlayEl = document.getElementById('matrixCheatOverlay');
+const matrixCheatRainEl = document.getElementById('matrixCheatRain');
 
 let currentChatId = null;
 let chats = loadChats();
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+const MATRIX_CHEAT_REGEX = /(^|[^a-z0-9])matrix([^a-z0-9]|$)/i;
+const MATRIX_REDIRECT_PATH = '/exit-matrix';
+const MATRIX_CHEAT_DURATION_MS = prefersReducedMotion ? 700 : 4200;
+const MATRIX_COLUMN_CHARS = '0123456789';
 let chatLoaderHidden = false;
 let isSending = false;
+let isMatrixSequenceRunning = false;
 const AUTO_SCROLL_THRESHOLD_PX = 96;
 const TEXTAREA_MAX_HEIGHT_PX = 170;
 const smoothScrollStates = new WeakMap();
@@ -76,6 +83,59 @@ function resizeMessageInput() {
   if (!inputEl) return;
   inputEl.style.height = 'auto';
   inputEl.style.height = `${Math.min(inputEl.scrollHeight, TEXTAREA_MAX_HEIGHT_PX)}px`;
+}
+
+function containsMatrixCheatCode(text) {
+  return MATRIX_CHEAT_REGEX.test(text);
+}
+
+function randomMatrixColumn(length) {
+  let value = '';
+  for (let i = 0; i < length; i += 1) {
+    const index = Math.floor(Math.random() * MATRIX_COLUMN_CHARS.length);
+    value += `${MATRIX_COLUMN_CHARS[index]}\n`;
+  }
+  return value;
+}
+
+function ensureMatrixCheatRain() {
+  if (!matrixCheatRainEl || matrixCheatRainEl.childElementCount > 0) return;
+
+  const columns = Math.max(16, Math.floor(window.innerWidth / 24));
+  for (let i = 0; i < columns; i += 1) {
+    const column = document.createElement('span');
+    column.className = 'matrix-cheat-column';
+    column.style.left = `${(i / columns) * 100}%`;
+    column.style.setProperty('--matrix-fall-duration', `${(2.2 + Math.random() * 3).toFixed(2)}s`);
+    column.style.setProperty('--matrix-fall-delay', `${(-Math.random() * 3.8).toFixed(2)}s`);
+    column.style.setProperty('--matrix-fall-opacity', (0.36 + Math.random() * 0.54).toFixed(2));
+    column.style.setProperty('--matrix-fall-size', `${12 + Math.floor(Math.random() * 6)}px`);
+    column.textContent = randomMatrixColumn(20 + Math.floor(Math.random() * 18));
+    matrixCheatRainEl.appendChild(column);
+  }
+}
+
+function triggerMatrixCheatSequence() {
+  if (isMatrixSequenceRunning) return;
+  isMatrixSequenceRunning = true;
+  ensureMatrixCheatRain();
+  setSendingState(true);
+
+  if (typingEl) typingEl.hidden = true;
+  if (inputEl) {
+    inputEl.disabled = true;
+    inputEl.blur();
+  }
+  if (newChatBtn) newChatBtn.disabled = true;
+  if (toggleSidebarBtn) toggleSidebarBtn.disabled = true;
+  if (logoutBtn) logoutBtn.disabled = true;
+
+  document.body.classList.add('matrix-cheat-mode');
+  matrixCheatOverlayEl?.classList.add('is-active');
+
+  window.setTimeout(() => {
+    window.location.assign(MATRIX_REDIRECT_PATH);
+  }, MATRIX_CHEAT_DURATION_MS);
 }
 
 function setSendingState(nextState) {
@@ -434,6 +494,11 @@ async function sendMessage() {
   chatTitleEl.textContent = chat.title;
   appendMessage('user', text, userMessage.ts, { forceAutoScroll: true });
   renderChatList();
+
+  if (containsMatrixCheatCode(text)) {
+    triggerMatrixCheatSequence();
+    return;
+  }
 
   setSendingState(true);
   typingEl.hidden = false;

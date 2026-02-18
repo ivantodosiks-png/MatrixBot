@@ -2496,5 +2496,177 @@ body.chat-page {
   }
 }
 
+/* Matrix cheat sequence */
+body.chat-page.matrix-cheat-mode {
+  overflow: hidden;
+}
+
+.chat-page .matrix-cheat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(120% 80% at 50% 50%, rgba(2, 12, 8, 0.14), rgba(2, 12, 8, 0.94));
+  transition: opacity 0.45s ease;
+}
+
+.chat-page .matrix-cheat-overlay.is-active {
+  opacity: 1;
+}
+
+.chat-page .matrix-cheat-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 60% at 50% 50%, rgba(6, 39, 24, 0) 0%, rgba(6, 39, 24, 0.88) 100%),
+    linear-gradient(180deg, rgba(10, 37, 24, 0.15), rgba(2, 14, 9, 0.62));
+  animation: matrix-vignette-pulse 2.2s ease-in-out infinite;
+}
+
+.chat-page .matrix-cheat-rain {
+  position: absolute;
+  inset: -15% 0 0;
+  overflow: hidden;
+}
+
+.chat-page .matrix-cheat-column {
+  position: absolute;
+  top: -120%;
+  white-space: pre;
+  font-family: "Sora", "Consolas", "Courier New", monospace;
+  font-size: var(--matrix-fall-size, 13px);
+  line-height: 1.15;
+  color: rgba(147, 255, 171, 0.88);
+  opacity: var(--matrix-fall-opacity, 0.66);
+  text-shadow: 0 0 10px rgba(96, 255, 130, 0.45);
+  animation: matrix-fall var(--matrix-fall-duration, 3s) linear infinite;
+  animation-delay: var(--matrix-fall-delay, 0s);
+}
+
+body.chat-page.matrix-cheat-mode .app {
+  animation: matrix-ui-melt 3.8s cubic-bezier(0.24, 0.78, 0.2, 1) forwards;
+}
+
+body.chat-page.matrix-cheat-mode .bg-grid,
+body.chat-page.matrix-cheat-mode .bg-rain {
+  animation: matrix-bg-fade 3.8s ease forwards;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-8%);
+  }
+  100% {
+    transform: translateY(220%);
+  }
+}
+
+@keyframes matrix-ui-melt {
+  0% {
+    filter: blur(0) brightness(1) saturate(1);
+    transform: scale(1);
+    opacity: 1;
+  }
+  38% {
+    filter: blur(2px) brightness(0.95) saturate(1.25);
+    transform: scale(0.995);
+    opacity: 1;
+  }
+  100% {
+    filter: blur(15px) brightness(0.34) saturate(1.5);
+    transform: scale(1.03);
+    opacity: 0.1;
+  }
+}
+
+@keyframes matrix-bg-fade {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes matrix-vignette-pulse {
+  0%,
+  100% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-page .matrix-cheat-vignette,
+  .chat-page .matrix-cheat-column {
+    animation: none;
+  }
+
+  body.chat-page.matrix-cheat-mode .app,
+  body.chat-page.matrix-cheat-mode .bg-grid,
+  body.chat-page.matrix-cheat-mode .bg-rain {
+    animation: none;
+    filter: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Exit matrix page */
+body.matrix-exit-page {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(900px 480px at 50% -10%, rgba(128, 252, 177, 0.2), transparent 58%),
+    linear-gradient(160deg, #020b07 0%, #04150d 52%, #071e14 100%);
+}
+
+.matrix-exit-wrap {
+  position: relative;
+  z-index: 1;
+  width: min(680px, 92vw);
+  padding: clamp(24px, 5vw, 48px);
+  border-radius: 18px;
+  border: 1px solid rgba(119, 246, 166, 0.42);
+  background: linear-gradient(160deg, rgba(6, 24, 16, 0.9), rgba(7, 30, 20, 0.86));
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.44), inset 0 0 0 1px rgba(119, 246, 166, 0.16);
+  text-align: center;
+}
+
+.matrix-exit-kicker {
+  margin: 0 0 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.76rem;
+  color: #8fe3b0;
+}
+
+.matrix-exit-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 5.3vw, 3.2rem);
+  color: #eafff2;
+  text-shadow: 0 0 22px rgba(145, 255, 184, 0.28);
+}
+
+.matrix-exit-subtitle {
+  margin: 12px auto 0;
+  max-width: 44ch;
+  color: #b5e7c8;
+}
+
+.matrix-exit-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 
 

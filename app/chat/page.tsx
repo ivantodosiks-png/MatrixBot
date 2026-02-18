@@ -9,6 +9,10 @@ export default function ChatPage() {
 
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-rain" aria-hidden="true" />
+      <div className="matrix-cheat-overlay" id="matrixCheatOverlay" aria-hidden="true">
+        <div className="matrix-cheat-vignette" />
+        <div className="matrix-cheat-rain" id="matrixCheatRain" />
+      </div>
 
       <div className="app">
         <div className="chat-loader" id="chatLoader" aria-live="polite">
@@ -106,6 +110,5 @@ export default function ChatPage() {
     </>
   );
 }
-
 
 
