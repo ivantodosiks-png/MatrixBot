@@ -40,7 +40,9 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
 const MATRIX_CHEAT_REGEX = /(^|[^a-z0-9])matrix([^a-z0-9]|$)/i;
 const MATRIX_REDIRECT_PATH = '/exit-matrix';
-const MATRIX_CHEAT_DURATION_MS = 9000;
+const MATRIX_CHEAT_DURATION_MS = 10000;
+const MATRIX_CHEAT_FADE_OUT_MS = 1600;
+const MATRIX_CHEAT_FINISH_START_MS = MATRIX_CHEAT_DURATION_MS - MATRIX_CHEAT_FADE_OUT_MS;
 const MATRIX_COLUMN_CHARS = '0123456789';
 const MATRIX_SHARD_CHARS = '01[]{}<>()=#';
 let chatLoaderHidden = false;
@@ -117,8 +119,8 @@ function ensureMatrixCheatRain() {
     const column = document.createElement('span');
     column.className = 'matrix-cheat-column';
     column.style.left = `${(i / columns) * 100}%`;
-    column.style.setProperty('--matrix-fall-duration', `${(4.8 + Math.random() * 2.8).toFixed(2)}s`);
-    column.style.setProperty('--matrix-fall-delay', `${(-Math.random() * 3.8).toFixed(2)}s`);
+    column.style.setProperty('--matrix-fall-duration', `${(6.4 + Math.random() * 2.8).toFixed(2)}s`);
+    column.style.setProperty('--matrix-fall-delay', `${(Math.random() * 1.4).toFixed(2)}s`);
     column.style.setProperty('--matrix-fall-opacity', (0.36 + Math.random() * 0.54).toFixed(2));
     column.style.setProperty('--matrix-fall-size', `${12 + Math.floor(Math.random() * 6)}px`);
     column.textContent = randomMatrixColumn(20 + Math.floor(Math.random() * 18));
@@ -165,8 +167,15 @@ function triggerMatrixCheatSequence() {
   if (toggleSidebarBtn) toggleSidebarBtn.disabled = true;
   if (logoutBtn) logoutBtn.disabled = true;
 
+  document.body.classList.remove('matrix-cheat-finishing');
   document.body.classList.add('matrix-cheat-mode');
   matrixCheatOverlayEl?.classList.add('is-active');
+  matrixCheatOverlayEl?.classList.remove('is-finishing');
+
+  window.setTimeout(() => {
+    document.body.classList.add('matrix-cheat-finishing');
+    matrixCheatOverlayEl?.classList.add('is-finishing');
+  }, MATRIX_CHEAT_FINISH_START_MS);
 
   window.setTimeout(() => {
     window.location.assign(MATRIX_REDIRECT_PATH);
