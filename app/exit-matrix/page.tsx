@@ -20,6 +20,7 @@ export default function ExitMatrixPage() {
             priority
           />
         </div>
+        <p className="matrix-exit-kicker">NEO // THE ONE</p>
         <p className="matrix-exit-kicker">SYSTEM MESSAGE</p>
         <h1 className="matrix-exit-title">
           {"\u0412\u044b \u0432\u044b\u0448\u043b\u0438 \u0438\u0437 \u043c\u0430\u0442\u0440\u0438\u0446\u044b"}

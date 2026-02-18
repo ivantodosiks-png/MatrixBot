@@ -2508,6 +2508,7 @@ body.chat-page.matrix-cheat-mode {
   pointer-events: none;
   opacity: 0;
   background: radial-gradient(120% 80% at 50% 50%, rgba(2, 12, 8, 0.14), rgba(2, 12, 8, 0.94));
+  mix-blend-mode: screen;
   transition: opacity 0.45s ease;
 }
 
@@ -2530,6 +2531,12 @@ body.chat-page.matrix-cheat-mode {
   overflow: hidden;
 }
 
+.chat-page .matrix-cheat-shards {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
 .chat-page .matrix-cheat-column {
   position: absolute;
   top: -120%;
@@ -2544,8 +2551,63 @@ body.chat-page.matrix-cheat-mode {
   animation-delay: var(--matrix-fall-delay, 0s);
 }
 
+.chat-page .matrix-cheat-shard {
+  position: absolute;
+  left: var(--matrix-shard-x, 50%);
+  top: var(--matrix-shard-y, 50%);
+  width: var(--matrix-shard-w, 72px);
+  height: var(--matrix-shard-h, 30px);
+  padding: 2px 5px;
+  border: 1px solid rgba(123, 255, 169, 0.55);
+  border-radius: 4px;
+  color: rgba(167, 255, 191, 0.92);
+  background: linear-gradient(180deg, rgba(8, 29, 18, 0.82), rgba(5, 17, 11, 0.55));
+  font-family: "Sora", "Consolas", "Courier New", monospace;
+  font-size: clamp(9px, 0.75vw, 12px);
+  line-height: 1.05;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 0 8px rgba(105, 255, 145, 0.62);
+  animation:
+    matrix-shard-burst var(--matrix-shard-dur, 5.8s) cubic-bezier(0.12, 0.7, 0.24, 1) forwards,
+    matrix-shard-flicker 0.22s steps(2, end) infinite;
+  animation-delay: var(--matrix-shard-delay, 0s), var(--matrix-shard-delay, 0s);
+}
+
 body.chat-page.matrix-cheat-mode .app {
   animation: matrix-ui-melt 8.6s cubic-bezier(0.24, 0.78, 0.2, 1) forwards;
+}
+
+body.chat-page.matrix-cheat-mode .sidebar {
+  animation: matrix-pane-left 8.6s cubic-bezier(0.25, 0.72, 0.2, 1) forwards;
+}
+
+body.chat-page.matrix-cheat-mode .main {
+  animation: matrix-pane-right 8.6s cubic-bezier(0.25, 0.72, 0.2, 1) forwards;
+}
+
+body.chat-page.matrix-cheat-mode .messages::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(134, 255, 176, 0) 0 4px,
+      rgba(134, 255, 176, 0.18) 4px 5px,
+      rgba(134, 255, 176, 0) 5px 11px
+    );
+  opacity: 0;
+  mix-blend-mode: screen;
+  animation: matrix-scan-break 8.4s linear forwards;
+}
+
+body.chat-page.matrix-cheat-mode .msg {
+  animation: matrix-msg-erase 6.8s ease forwards;
 }
 
 body.chat-page.matrix-cheat-mode .bg-grid,
@@ -2580,6 +2642,90 @@ body.chat-page.matrix-cheat-mode .bg-rain {
   }
 }
 
+@keyframes matrix-pane-left {
+  0% {
+    transform: translateX(0);
+    filter: blur(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-58px) skewX(-4deg);
+    filter: blur(7px);
+    opacity: 0.24;
+  }
+}
+
+@keyframes matrix-pane-right {
+  0% {
+    transform: translateX(0);
+    filter: blur(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(62px) skewX(3.2deg);
+    filter: blur(7px);
+    opacity: 0.24;
+  }
+}
+
+@keyframes matrix-scan-break {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0.82;
+    transform: translateY(26px);
+  }
+}
+
+@keyframes matrix-msg-erase {
+  0% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    filter: blur(0.8px);
+  }
+  100% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+}
+
+@keyframes matrix-shard-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.7);
+  }
+  8% {
+    opacity: var(--matrix-shard-alpha, 0.7);
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--matrix-shard-tx, 120px)), calc(-50% + var(--matrix-shard-ty, 240px)))
+      rotate(var(--matrix-shard-rot, 18deg))
+      scale(0.32);
+  }
+}
+
+@keyframes matrix-shard-flicker {
+  0%,
+  100% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(-12deg);
+  }
+}
+
 @keyframes matrix-bg-fade {
   0% {
     opacity: 0.2;
@@ -2611,15 +2757,45 @@ body.matrix-exit-page {
     linear-gradient(160deg, #020b07 0%, #04150d 52%, #071e14 100%);
 }
 
+body.matrix-exit-page::before {
+  content: "";
+  position: fixed;
+  inset: -20% 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(130, 255, 171, 0) 0 10px,
+    rgba(130, 255, 171, 0.09) 10px 11px,
+    rgba(130, 255, 171, 0) 11px 23px
+  );
+  opacity: 0.42;
+  animation: matrix-exit-code-rain 12s linear infinite;
+}
+
+body.matrix-exit-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(123, 255, 167, 0.25), rgba(123, 255, 167, 0) 58%),
+    radial-gradient(circle at 50% 120%, rgba(62, 140, 95, 0.22), rgba(62, 140, 95, 0) 60%);
+}
+
 .matrix-exit-wrap {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: min(860px, 92vw);
   padding: clamp(24px, 5vw, 48px);
-  border-radius: 18px;
+  border-radius: 22px;
   border: 1px solid rgba(119, 246, 166, 0.42);
-  background: linear-gradient(160deg, rgba(6, 24, 16, 0.9), rgba(7, 30, 20, 0.86));
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.44), inset 0 0 0 1px rgba(119, 246, 166, 0.16);
+  background:
+    linear-gradient(160deg, rgba(6, 24, 16, 0.9), rgba(7, 30, 20, 0.86)),
+    radial-gradient(circle at 50% -20%, rgba(147, 255, 189, 0.12), rgba(147, 255, 189, 0) 62%);
+  box-shadow:
+    0 28px 58px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(119, 246, 166, 0.16),
+    0 0 36px rgba(115, 255, 171, 0.15);
   text-align: center;
   display: grid;
   gap: 12px;
@@ -2628,11 +2804,26 @@ body.matrix-exit-page {
 .matrix-exit-visual {
   width: min(620px, 86vw);
   margin: 0 auto 8px;
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1px solid rgba(120, 250, 174, 0.34);
-  background: radial-gradient(circle at 50% 20%, rgba(34, 88, 58, 0.36), rgba(7, 23, 16, 0.72));
-  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.35), 0 0 30px rgba(116, 252, 171, 0.14);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(34, 88, 58, 0.36), rgba(7, 23, 16, 0.72)),
+    linear-gradient(180deg, rgba(17, 42, 28, 0.6), rgba(6, 18, 12, 0.5));
+  box-shadow:
+    0 20px 42px rgba(0, 0, 0, 0.42),
+    0 0 34px rgba(116, 252, 171, 0.18),
+    inset 0 0 0 1px rgba(143, 255, 189, 0.18);
   overflow: hidden;
+  position: relative;
+}
+
+.matrix-exit-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(154, 255, 195, 0.12), rgba(154, 255, 195, 0));
+  mix-blend-mode: screen;
 }
 
 .matrix-exit-visual img {
@@ -2652,9 +2843,9 @@ body.matrix-exit-page {
 
 .matrix-exit-title {
   margin: 0;
-  font-size: clamp(1.9rem, 5.3vw, 3.2rem);
+  font-size: clamp(2rem, 5.3vw, 3.45rem);
   color: #eafff2;
-  text-shadow: 0 0 22px rgba(145, 255, 184, 0.28);
+  text-shadow: 0 0 22px rgba(145, 255, 184, 0.28), 0 0 46px rgba(95, 236, 151, 0.22);
 }
 
 .matrix-exit-subtitle {
@@ -2669,6 +2860,15 @@ body.matrix-exit-page {
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@keyframes matrix-exit-code-rain {
+  0% {
+    transform: translateY(-8%);
+  }
+  100% {
+    transform: translateY(8%);
+  }
 }
 
 @keyframes matrix-exit-float {

@@ -32,6 +32,7 @@ const apiStatusEl = document.getElementById('apiStatus');
 const chatLoaderEl = document.getElementById('chatLoader');
 const matrixCheatOverlayEl = document.getElementById('matrixCheatOverlay');
 const matrixCheatRainEl = document.getElementById('matrixCheatRain');
+const matrixCheatShardsEl = document.getElementById('matrixCheatShards');
 
 let currentChatId = null;
 let chats = loadChats();
@@ -41,6 +42,7 @@ const MATRIX_CHEAT_REGEX = /(^|[^a-z0-9])matrix([^a-z0-9]|$)/i;
 const MATRIX_REDIRECT_PATH = '/exit-matrix';
 const MATRIX_CHEAT_DURATION_MS = 9000;
 const MATRIX_COLUMN_CHARS = '0123456789';
+const MATRIX_SHARD_CHARS = '01[]{}<>()=#';
 let chatLoaderHidden = false;
 let isSending = false;
 let isMatrixSequenceRunning = false;
@@ -98,6 +100,15 @@ function randomMatrixColumn(length) {
   return value;
 }
 
+function randomShardCode(length) {
+  let value = '';
+  for (let i = 0; i < length; i += 1) {
+    const index = Math.floor(Math.random() * MATRIX_SHARD_CHARS.length);
+    value += MATRIX_SHARD_CHARS[index];
+  }
+  return value;
+}
+
 function ensureMatrixCheatRain() {
   if (!matrixCheatRainEl || matrixCheatRainEl.childElementCount > 0) return;
 
@@ -115,10 +126,34 @@ function ensureMatrixCheatRain() {
   }
 }
 
+function ensureMatrixCheatShards() {
+  if (!matrixCheatShardsEl) return;
+  matrixCheatShardsEl.textContent = '';
+
+  const shardCount = Math.max(44, Math.floor(window.innerWidth / 18));
+  for (let i = 0; i < shardCount; i += 1) {
+    const shard = document.createElement('span');
+    shard.className = 'matrix-cheat-shard';
+    shard.textContent = randomShardCode(7 + Math.floor(Math.random() * 8));
+    shard.style.setProperty('--matrix-shard-x', `${(Math.random() * 100).toFixed(2)}%`);
+    shard.style.setProperty('--matrix-shard-y', `${(Math.random() * 100).toFixed(2)}%`);
+    shard.style.setProperty('--matrix-shard-w', `${42 + Math.floor(Math.random() * 90)}px`);
+    shard.style.setProperty('--matrix-shard-h', `${16 + Math.floor(Math.random() * 48)}px`);
+    shard.style.setProperty('--matrix-shard-tx', `${(-260 + Math.random() * 520).toFixed(1)}px`);
+    shard.style.setProperty('--matrix-shard-ty', `${(120 + Math.random() * 560).toFixed(1)}px`);
+    shard.style.setProperty('--matrix-shard-rot', `${(-32 + Math.random() * 64).toFixed(2)}deg`);
+    shard.style.setProperty('--matrix-shard-delay', `${(Math.random() * 3.3).toFixed(2)}s`);
+    shard.style.setProperty('--matrix-shard-dur', `${(4.2 + Math.random() * 3).toFixed(2)}s`);
+    shard.style.setProperty('--matrix-shard-alpha', (0.34 + Math.random() * 0.56).toFixed(2));
+    matrixCheatShardsEl.appendChild(shard);
+  }
+}
+
 function triggerMatrixCheatSequence() {
   if (isMatrixSequenceRunning) return;
   isMatrixSequenceRunning = true;
   ensureMatrixCheatRain();
+  ensureMatrixCheatShards();
   setSendingState(true);
 
   if (typingEl) typingEl.hidden = true;

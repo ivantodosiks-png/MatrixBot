@@ -12,6 +12,7 @@ export default function ChatPage() {
       <div className="matrix-cheat-overlay" id="matrixCheatOverlay" aria-hidden="true">
         <div className="matrix-cheat-vignette" />
         <div className="matrix-cheat-rain" id="matrixCheatRain" />
+        <div className="matrix-cheat-shards" id="matrixCheatShards" />
       </div>
 
       <div className="app">
@@ -110,5 +111,4 @@ export default function ChatPage() {
     </>
   );
 }
-
 
