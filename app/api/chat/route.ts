@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import crypto from "node:crypto";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import {
@@ -181,15 +180,6 @@ export async function POST(request: Request) {
   };
 
   try {
-    const keyFingerprint = crypto
-      .createHash("sha256")
-      .update(apiKey)
-      .digest("hex")
-      .slice(0, 12);
-    console.info(
-      `[chat-api] key_fingerprint=${keyFingerprint} key_len=${apiKey.length}`
-    );
-
     const upstream = await fetch(OPENAI_API_URL, {
       method: "POST",
       headers: {

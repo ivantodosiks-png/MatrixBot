@@ -1,5 +1,5 @@
 import type { UserPlan } from "@/lib/user-store";
-import { getStripePriceMap } from "@/lib/stripe-config";
+import { getLemonVariantMap } from "@/lib/lemon-config";
 
 export type PublicPlan = "free" | "pro" | "ultra";
 
@@ -42,13 +42,13 @@ export function userPlanToPublicPlan(plan: UserPlan): PublicPlan {
   return "free";
 }
 
-export function resolvePlanByPriceId(priceId: string | null | undefined) {
-  if (!priceId) return "FREE" satisfies UserPlan;
+export function resolvePlanByVariantId(variantId: string | null | undefined) {
+  if (!variantId) return "FREE" satisfies UserPlan;
 
-  const prices = getStripePriceMap();
+  const variants = getLemonVariantMap();
 
-  if (priceId === prices.pro) return "PRO" satisfies UserPlan;
-  if (priceId === prices.ultra) return "ULTRA" satisfies UserPlan;
+  if (variantId === variants.pro) return "PRO" satisfies UserPlan;
+  if (variantId === variants.ultra) return "ULTRA" satisfies UserPlan;
 
   return "FREE" satisfies UserPlan;
 }

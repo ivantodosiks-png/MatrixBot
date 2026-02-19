@@ -492,6 +492,36 @@ export async function updateUserSubscriptionByStripeCustomer(
   });
 }
 
+export async function updateUserSubscriptionByUserId(
+  userId: string,
+  update: StripeSubscriptionUpdate & { stripeCustomerId?: string | null }
+) {
+  if (!userId) return;
+
+  await withSchema(async () => {
+    await dbQuery(
+      `
+      UPDATE public.users
+      SET
+        plan = $2,
+        subscription_status = $3,
+        stripe_subscription_id = $4,
+        current_period_end = $5,
+        stripe_customer_id = COALESCE($6, stripe_customer_id)
+      WHERE id = $1
+      `,
+      [
+        userId,
+        update.plan,
+        update.subscriptionStatus,
+        update.stripeSubscriptionId ?? null,
+        update.currentPeriodEnd ? update.currentPeriodEnd.toISOString() : null,
+        update.stripeCustomerId ?? null,
+      ]
+    );
+  });
+}
+
 export async function canUserSendChatMessage(userId: string): Promise<ChatAccessResult> {
   const user = await findUserById(userId);
   if (!user) {

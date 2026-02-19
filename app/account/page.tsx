@@ -106,7 +106,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
           </dl>
 
           <div className="account-actions">
-            {user.stripe_customer_id ? <ManageSubscriptionButton /> : null}
+            {user.stripe_subscription_id ? <ManageSubscriptionButton /> : null}
             <SignOutButton />
             <a className="lp-btn lp-btn-primary" href="/chat">
               Go to chat

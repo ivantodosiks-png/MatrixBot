@@ -20,7 +20,7 @@ export default function ManageSubscriptionButton() {
     setError("");
 
     try {
-      const response = await fetch("/api/stripe/create-portal-session", {
+      const response = await fetch("/api/lemon/create-portal-session", {
         method: "POST",
       });
       const data = (await response.json().catch(() => ({}))) as ApiResponse;

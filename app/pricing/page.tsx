@@ -44,8 +44,8 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           <p className="lp-eyebrow">SUBSCRIPTIONS</p>
           <h1>Choose a plan that matches your chat volume.</h1>
           <p>
-            Free is great for lightweight use. Pro and Ultra are real Stripe subscriptions
-            with automatic billing and portal-based management.
+            Free is great for lightweight use. Pro and Ultra are real Lemon Squeezy
+            subscriptions with automatic billing and customer portal management.
           </p>
           {canceled ? (
             <p className="pricing-banner">Checkout canceled. You can choose a plan again.</p>
@@ -86,7 +86,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
             <ul>
               <li>{PLAN_DETAILS.PRO.limitLabel}</li>
               <li>Priority responses</li>
-              <li>Subscription billing via Stripe</li>
+              <li>Subscription billing via Lemon Squeezy</li>
             </ul>
             <PricingPlanAction
               plan={PLAN_DETAILS.PRO.id}
