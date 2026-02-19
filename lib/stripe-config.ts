@@ -63,6 +63,10 @@ export function getStripeWebhookSecret() {
 }
 
 function validateStripePriceId(name: string, value: string) {
+  if (value.includes("XXXX")) {
+    throw new Error(`Invalid ${name}: placeholder value detected`);
+  }
+
   assertNotPlaceholder(name, value);
 
   if (value.startsWith("prod_")) {
