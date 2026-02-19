@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
+﻿/* eslint-disable @next/next/no-html-link-for-pages */
 import BodyClass from "@/components/body-class";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -34,7 +34,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           <nav className="lp-nav" aria-label="Pricing navigation">
             <a href="/">Home</a>
             <a href="/chat">Chat</a>
-            <a href="/pricing">Подписки</a>
+            <a href="/pricing">Subscriptions</a>
             <a href="/account">Account</a>
           </nav>
         </header>
@@ -75,7 +75,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
           </article>
 
           <article className={`pricing-card popular ${currentPlan === "pro" ? "active" : ""}`}>
-            <div className="pricing-badge">Популярный</div>
+            <div className="pricing-badge">Popular</div>
             <div className="pricing-card-head">
               <h2>{PLAN_DETAILS.PRO.name}</h2>
               <p>

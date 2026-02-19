@@ -1,4 +1,5 @@
 import type { UserPlan } from "@/lib/user-store";
+import { getStripePriceMap } from "@/lib/stripe-config";
 
 export type PublicPlan = "free" | "pro" | "ultra";
 
@@ -8,7 +9,7 @@ export const PLAN_DETAILS = {
     name: "Free",
     priceLabel: "0 EUR",
     periodLabel: "forever",
-    limitLabel: "20 messages/day",
+    limitLabel: "Unlimited messages",
     perks: ["Core chat access"],
   },
   PRO: {
@@ -16,7 +17,7 @@ export const PLAN_DETAILS = {
     name: "Pro",
     priceLabel: "9.99 EUR",
     periodLabel: "per month",
-    limitLabel: "500 messages/month",
+    limitLabel: "Unlimited messages",
     perks: ["Priority responses"],
   },
   ULTRA: {
@@ -44,11 +45,10 @@ export function userPlanToPublicPlan(plan: UserPlan): PublicPlan {
 export function resolvePlanByPriceId(priceId: string | null | undefined) {
   if (!priceId) return "FREE" satisfies UserPlan;
 
-  const proPrice = String(process.env.STRIPE_PRICE_PRO ?? "").trim();
-  const ultraPrice = String(process.env.STRIPE_PRICE_ULTRA ?? "").trim();
+  const prices = getStripePriceMap();
 
-  if (proPrice && priceId === proPrice) return "PRO" satisfies UserPlan;
-  if (ultraPrice && priceId === ultraPrice) return "ULTRA" satisfies UserPlan;
+  if (priceId === prices.pro) return "PRO" satisfies UserPlan;
+  if (priceId === prices.ultra) return "ULTRA" satisfies UserPlan;
 
   return "FREE" satisfies UserPlan;
 }

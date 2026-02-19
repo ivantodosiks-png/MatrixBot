@@ -4,8 +4,8 @@ import { dbQuery } from "@/lib/db";
 export type UserPlan = "FREE" | "PRO" | "ULTRA";
 export type UserSubscriptionStatus = "NONE" | "ACTIVE" | "PAST_DUE" | "CANCELED";
 
-export const FREE_DAILY_LIMIT = 20;
-export const PRO_MONTHLY_LIMIT = 500;
+export const FREE_DAILY_LIMIT = Number.MAX_SAFE_INTEGER;
+export const PRO_MONTHLY_LIMIT = Number.MAX_SAFE_INTEGER;
 
 export type UserRecord = {
   id: string;
@@ -310,12 +310,9 @@ async function updateUsageSnapshot(userId: string, usage: UsageSnapshot) {
 }
 
 function getPlanLimitExceededMessage(plan: UserPlan, usage: UsageSnapshot) {
-  if (plan === "FREE" && usage.dailyMessageCount >= FREE_DAILY_LIMIT) {
-    return "Limit reached, upgrade to Pro/Ultra";
-  }
-  if (plan === "PRO" && usage.monthlyMessageCount >= PRO_MONTHLY_LIMIT) {
-    return "Limit reached, upgrade to Pro/Ultra";
-  }
+  void plan;
+  void usage;
+  // Unlimited messaging enabled for all plans.
   return null;
 }
 

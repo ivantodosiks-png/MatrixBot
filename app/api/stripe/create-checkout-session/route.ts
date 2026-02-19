@@ -7,19 +7,13 @@ import {
   createStripeCustomer,
   getAppUrl,
 } from "@/lib/stripe";
+import { getStripePriceIdForPlan } from "@/lib/stripe-config";
 
 export const runtime = "nodejs";
 
 type RequestBody = {
   plan?: "pro" | "ultra";
 };
-
-function resolvePriceId(plan: "pro" | "ultra") {
-  if (plan === "pro") {
-    return String(process.env.STRIPE_PRICE_PRO ?? "").trim();
-  }
-  return String(process.env.STRIPE_PRICE_ULTRA ?? "").trim();
-}
 
 export async function POST(request: Request) {
   try {
@@ -43,13 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const priceId = resolvePriceId(plan);
-    if (!priceId) {
-      return NextResponse.json(
-        { error: { message: "Stripe price id is missing in env" } },
-        { status: 500 }
-      );
-    }
+    const priceId = getStripePriceIdForPlan(plan);
 
     const user = await findUserById(userId);
     if (!user) {

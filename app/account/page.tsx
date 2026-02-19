@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/sign-out-button";
@@ -55,7 +55,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
           <div className="account-top">
             <h1>Account</h1>
             <a className="lp-btn lp-btn-secondary" href="/pricing">
-              Подписки
+              Subscriptions
             </a>
           </div>
 
@@ -96,11 +96,11 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             </div>
             <div>
               <dt>Daily usage</dt>
-              <dd>{user.daily_message_count} / 20</dd>
+              <dd>{user.daily_message_count} (unlimited)</dd>
             </div>
             <div>
               <dt>Monthly usage</dt>
-              <dd>{user.monthly_message_count} / 500</dd>
+              <dd>{user.monthly_message_count} (unlimited)</dd>
             </div>
           </dl>
 

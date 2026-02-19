@@ -1,5 +1,10 @@
 import crypto from "node:crypto";
 import type { UserSubscriptionStatus } from "@/lib/user-store";
+import {
+  getAppUrl as readAppUrlFromEnv,
+  getStripeSecretKey as readStripeSecretKeyFromEnv,
+  getStripeWebhookSecret as readStripeWebhookSecretFromEnv,
+} from "@/lib/stripe-config";
 
 const STRIPE_API_BASE = "https://api.stripe.com/v1";
 const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
@@ -60,27 +65,15 @@ export type StripeWebhookEvent = {
 };
 
 function getStripeSecretKey() {
-  const key = String(process.env.STRIPE_SECRET_KEY ?? "").trim();
-  if (!key) {
-    throw new Error("STRIPE_SECRET_KEY is missing");
-  }
-  return key;
+  return readStripeSecretKeyFromEnv();
 }
 
 export function getStripeWebhookSecret() {
-  const secret = String(process.env.STRIPE_WEBHOOK_SECRET ?? "").trim();
-  if (!secret) {
-    throw new Error("STRIPE_WEBHOOK_SECRET is missing");
-  }
-  return secret;
+  return readStripeWebhookSecretFromEnv();
 }
 
 export function getAppUrl() {
-  const appUrl = String(process.env.NEXT_PUBLIC_APP_URL ?? "").trim();
-  if (!appUrl) {
-    throw new Error("NEXT_PUBLIC_APP_URL is missing");
-  }
-  return appUrl.replace(/\/+$/, "");
+  return readAppUrlFromEnv();
 }
 
 async function stripeRequest<T>(path: string, options: StripeRequestOptions = {}) {
