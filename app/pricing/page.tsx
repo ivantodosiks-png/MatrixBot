@@ -7,16 +7,17 @@ import { PLAN_DETAILS, userPlanToPublicPlan } from "@/lib/plans";
 import PricingPlanAction from "@/components/pricing-plan-action";
 
 type PricingPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     canceled?: string;
-  };
+  }>;
 };
 
 export default async function PricingPage({ searchParams }: PricingPageProps) {
   const session = await getServerSession(authOptions);
   const user = session?.user?.id ? await findUserById(session.user.id).catch(() => null) : null;
   const currentPlan = user ? userPlanToPublicPlan(user.plan) : null;
-  const canceled = searchParams?.canceled === "1";
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const canceled = resolvedSearchParams?.canceled === "1";
 
   return (
     <>

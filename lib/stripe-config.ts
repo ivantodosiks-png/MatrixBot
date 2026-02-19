@@ -12,6 +12,8 @@ function looksLikePlaceholder(value: string) {
   const normalized = value.trim();
   if (!normalized) return true;
 
+  if (normalized.includes("XXXX")) return true;
+
   if (/^price_[Xx]+$/.test(normalized)) return true;
   if (/^whsec_[Xx]+$/.test(normalized)) return true;
   if (/^(sk|pk)_(test|live)_[Xx]+$/.test(normalized)) return true;

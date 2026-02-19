@@ -7,10 +7,10 @@ import BodyClass from "@/components/body-class";
 import { findUserById } from "@/lib/user-store";
 
 type AccountPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     success?: string;
     plan?: string;
-  };
+  }>;
 };
 
 function formatPeriod(value: string | null) {
@@ -39,8 +39,9 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     redirect("/login");
   }
 
-  const checkoutSuccess = searchParams?.success === "1";
-  const freeSelected = searchParams?.plan === "free";
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const checkoutSuccess = resolvedSearchParams?.success === "1";
+  const freeSelected = resolvedSearchParams?.plan === "free";
 
   return (
     <>
