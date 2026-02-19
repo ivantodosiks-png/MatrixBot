@@ -12,11 +12,10 @@ function looksLikePlaceholder(value: string) {
   const normalized = value.trim();
   if (!normalized) return true;
 
-  if (normalized.includes("XXXX")) return true;
-
-  if (/^price_[Xx]+$/.test(normalized)) return true;
-  if (/^whsec_[Xx]+$/.test(normalized)) return true;
-  if (/^(sk|pk)_(test|live)_[Xx]+$/.test(normalized)) return true;
+  // Match only explicit placeholder forms, not valid ids that happen to contain X.
+  if (/^price_(X{6,}|x{6,})$/.test(normalized)) return true;
+  if (/^whsec_(X{6,}|x{6,})$/.test(normalized)) return true;
+  if (/^(sk|pk)_(test|live)_(X{6,}|x{6,})$/.test(normalized)) return true;
 
   const placeholderTokens = [
     "XXXXXXXXXXXXXXXX",
