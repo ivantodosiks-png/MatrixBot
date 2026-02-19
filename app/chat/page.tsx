@@ -1,4 +1,4 @@
-﻿/* eslint-disable @next/next/no-html-link-for-pages */
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Script from "next/script";
 import BodyClass from "@/components/body-class";
 
@@ -48,7 +48,7 @@ export default function ChatPage() {
               <div className="user-email" id="userEmail" />
             </div>
             <button className="btn ghost tiny" id="logoutBtn">
-              ⟲
+              ?
             </button>
           </div>
 
@@ -76,7 +76,7 @@ export default function ChatPage() {
         <main className="main">
           <header className="topbar">
             <button className="btn ghost mobile-only" id="toggleSidebar">
-              ☰
+              ?
             </button>
             <div className="chat-title" id="chatTitle">
               -
@@ -84,6 +84,9 @@ export default function ChatPage() {
             <div className="spacer" />
             <a className="btn ghost" href="/">
               Til forsiden
+            </a>
+            <a className="btn ghost" href="/pricing">
+              Subscriptions
             </a>
           </header>
 
@@ -111,4 +114,3 @@ export default function ChatPage() {
     </>
   );
 }
-

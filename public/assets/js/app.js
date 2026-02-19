@@ -3,6 +3,7 @@ const MAX_HISTORY = 20;
 
 const DEFAULT_CONFIG = {
   apiUrl: '/api/chat',
+  metricsApiUrl: '/api/metrics',
   apiKey: '',
   model: 'gpt-4o-mini',
   systemPrompt: 'You are a helpful assistant. Reply in the same language as the user. Keep default replies short (1-3 concise paragraphs) unless the user asks for details.',
@@ -516,6 +517,25 @@ async function callModel(messages) {
   return content;
 }
 
+async function reportMetric(responseMs, success) {
+  if (!CONFIG.metricsApiUrl) return;
+
+  try {
+    await fetch(CONFIG.metricsApiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        responseMs: Math.max(0, Math.round(responseMs)),
+        success: Boolean(success)
+      })
+    });
+  } catch {
+    // Metrics errors should not interrupt chat UX.
+  }
+}
+
 async function sendMessage() {
   if (isSending) return;
   const text = inputEl.value.trim();
@@ -546,6 +566,8 @@ async function sendMessage() {
 
   setSendingState(true);
   typingEl.hidden = false;
+  const requestStartedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  let responseSucceeded = false;
 
   try {
     const apiMessages = buildMessagesForApi(chat);
@@ -556,10 +578,13 @@ async function sendMessage() {
     saveChats();
     appendMessage('assistant', reply, assistantMessage.ts);
     renderChatList();
+    responseSucceeded = true;
   } catch (err) {
     const msg = err && err.message ? err.message : 'Feil ved forespørsel.';
     appendMessage('assistant', `Feil: ${msg}`, Date.now());
   } finally {
+    const requestFinishedAt = typeof performance !== 'undefined' ? performance.now() : Date.now();
+    void reportMetric(requestFinishedAt - requestStartedAt, responseSucceeded);
     typingEl.hidden = true;
     setSendingState(false);
     inputEl?.focus();
@@ -585,7 +610,39 @@ if (toggleSidebarBtn) {
 
 logoutBtn?.addEventListener('click', () => {
   localStorage.removeItem('matrix_user');
-  window.location.href = '/login';
+
+  const signOut = async () => {
+    try {
+      const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+      const csrfData = await csrfRes.json();
+      const csrfToken = csrfData?.csrfToken;
+
+      if (!csrfToken) {
+        window.location.href = '/login';
+        return;
+      }
+
+      const body = new URLSearchParams({
+        csrfToken,
+        callbackUrl: '/login',
+        json: 'true'
+      });
+
+      await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+      });
+    } catch {
+      // Keep fallback redirect even if signout request fails.
+    } finally {
+      window.location.href = '/login';
+    }
+  };
+
+  void signOut();
 });
 
 updateUserInfo();

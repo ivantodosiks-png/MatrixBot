@@ -1,0 +1,229 @@
+/* Stats, pricing, and account pages */
+.lp-stat-value {
+  margin: 8px 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: clamp(1.5rem, 3.6vw, 2.2rem);
+  color: #ddf7ff;
+  letter-spacing: 0.03em;
+}
+
+body.pricing-page,
+body.account-page {
+  min-height: 100vh;
+}
+
+.pricing-shell,
+.account-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1160px, 94vw);
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 34px) 0 clamp(36px, 4vw, 56px);
+}
+
+.pricing-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.pricing-hero,
+.account-panel {
+  border: 1px solid rgba(124, 197, 255, 0.32);
+  border-radius: 18px;
+  background: linear-gradient(155deg, rgba(21, 39, 62, 0.84), rgba(16, 29, 49, 0.82));
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(8px);
+}
+
+.pricing-hero {
+  padding: clamp(20px, 3vw, 30px);
+  margin-bottom: 16px;
+}
+
+.pricing-hero h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(1.8rem, 4vw, 2.7rem);
+  line-height: 1.14;
+}
+
+.pricing-hero p {
+  margin: 0;
+  max-width: 68ch;
+  color: #c2d9f4;
+}
+
+.pricing-banner,
+.account-banner {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(126, 203, 255, 0.42);
+  border-radius: 10px;
+  color: #e6f6ff;
+  background: rgba(28, 52, 79, 0.74);
+}
+
+.account-banner.success {
+  border-color: rgba(125, 250, 214, 0.48);
+  background: rgba(20, 58, 59, 0.72);
+}
+
+.pricing-current-plan {
+  margin-top: 14px !important;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pricing-card {
+  position: relative;
+  border: 1px solid rgba(124, 197, 255, 0.3);
+  border-radius: 18px;
+  background: linear-gradient(152deg, rgba(21, 39, 62, 0.82), rgba(17, 32, 53, 0.8));
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.pricing-card.active {
+  border-color: rgba(125, 250, 214, 0.62);
+  box-shadow: 0 0 0 1px rgba(125, 250, 214, 0.28), 0 18px 34px rgba(0, 0, 0, 0.26);
+}
+
+.pricing-card.popular {
+  border-color: rgba(125, 250, 214, 0.52);
+}
+
+.pricing-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 250, 214, 0.62);
+  background: rgba(14, 52, 55, 0.85);
+  color: #d8fff4;
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+}
+
+.pricing-card-head h2 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.pricing-card-head p {
+  margin: 7px 0 0;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 1.25rem;
+  color: #f0fbff;
+}
+
+.pricing-card-head p span {
+  font-size: 0.8rem;
+  color: #b9d0ea;
+  margin-left: 4px;
+}
+
+.pricing-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #cee4fb;
+  display: grid;
+  gap: 8px;
+}
+
+.pricing-action-wrap,
+.account-manage-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.pricing-action-error,
+.account-action-error {
+  margin: 0;
+  font-size: 0.83rem;
+  color: #ffc6c6;
+}
+
+.account-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
+.account-panel {
+  width: min(860px, 100%);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.account-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.account-top h1 {
+  margin: 0;
+}
+
+.account-grid {
+  margin: 16px 0 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.account-grid div {
+  border: 1px solid rgba(126, 203, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(25, 45, 70, 0.66);
+  padding: 10px;
+}
+
+.account-grid dt {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9fbcda;
+}
+
+.account-grid dd {
+  margin: 6px 0 0;
+  color: #edf8ff;
+  overflow-wrap: anywhere;
+}
+
+.account-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 940px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pricing-header .lp-nav {
+    flex-wrap: wrap;
+  }
+
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}

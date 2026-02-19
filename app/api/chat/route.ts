@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import crypto from "node:crypto";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import {
+  canUserSendChatMessage,
+  incrementUsageAfterSuccessfulChat,
+} from "@/lib/user-store";
 
 export const runtime = "nodejs";
 
@@ -11,6 +17,8 @@ const SYSTEM_PROMPT = String(
     "You are a helpful assistant. Reply in the same language as the user. Keep default replies short (1-3 concise paragraphs) unless the user asks for details."
 ).trim();
 const DEFAULT_MAX_TOKENS = Number(process.env.MAX_TOKENS ?? 450);
+const LIMIT_EXCEEDED_MESSAGE =
+  "\u041b\u0438\u043c\u0438\u0442 \u0438\u0441\u0447\u0435\u0440\u043f\u0430\u043d, \u043f\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u043d\u0430 Pro/Ultra";
 
 type ChatBody = {
   messages?: Array<{ role: string; content: string }>;
@@ -31,7 +39,58 @@ function normalizeEnvSecret(value: string) {
   return trimmed.replace(/\s+/g, "");
 }
 
+function extractAssistantContent(payload: unknown) {
+  if (!payload || typeof payload !== "object") return "";
+
+  const choices = (payload as { choices?: unknown }).choices;
+  if (!Array.isArray(choices) || choices.length === 0) return "";
+
+  const first = choices[0] as { message?: { content?: unknown } };
+  const content = first?.message?.content;
+  if (typeof content !== "string") return "";
+
+  return content.trim();
+}
+
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return NextResponse.json(
+      {
+        error: {
+          message: "Authentication required. Please log in.",
+        },
+      },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const access = await canUserSendChatMessage(userId);
+    if (!access.allowed) {
+      return NextResponse.json(
+        {
+          error: {
+            message: LIMIT_EXCEEDED_MESSAGE,
+          },
+        },
+        { status: 429 }
+      );
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Usage check failed";
+    return NextResponse.json(
+      {
+        error: {
+          message,
+        },
+      },
+      { status: 500 }
+    );
+  }
+
   const apiKey = normalizeEnvSecret(
     String(process.env.OPENAI_API_KEY ?? process.env.OPENAI_KEY ?? "")
   );
@@ -61,8 +120,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: {
-          message:
-            "OPENAI_API_KEY has invalid format (must start with sk-)",
+          message: "OPENAI_API_KEY has invalid format (must start with sk-)",
         },
       },
       { status: 500 }
@@ -167,6 +225,21 @@ export async function POST(request: Request) {
           );
         }
         return NextResponse.json(parsed, { status: upstream.status });
+      }
+
+      const assistantContent = extractAssistantContent(parsed);
+      if (upstream.ok && assistantContent) {
+        const usageResult = await incrementUsageAfterSuccessfulChat(userId);
+        if (!usageResult.ok) {
+          return NextResponse.json(
+            {
+              error: {
+                message: LIMIT_EXCEEDED_MESSAGE,
+              },
+            },
+            { status: 429 }
+          );
+        }
       }
 
       return new NextResponse(text, {

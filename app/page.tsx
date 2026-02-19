@@ -1,8 +1,15 @@
-﻿/* eslint-disable @next/next/no-html-link-for-pages */
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Script from "next/script";
 import BodyClass from "@/components/body-class";
+import { getPublicStats } from "@/lib/stats";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const stats = await getPublicStats(120).catch(() => ({
+    usersCount: 0,
+    successfulChatsCount: 0,
+    responsesPerSecond: 0,
+  }));
+
   return (
     <>
       <BodyClass classes="matrix landing" />
@@ -22,9 +29,11 @@ export default function HomePage() {
             MATRIX GPT
           </a>
           <nav className="lp-nav" aria-label="Main navigation">
+            <a href="#stats">Stats</a>
             <a href="#features">Features</a>
             <a href="#how">How it works</a>
             <a href="#faq">FAQ</a>
+            <a href="/pricing">Subscriptions</a>
           </nav>
           <div className="lp-header-cta">
             <span className="lp-online-pill">Core online</span>
@@ -122,6 +131,32 @@ export default function HomePage() {
               <span>SECURE BY DEFAULT</span>
               <span>NEON CONTROL PANEL</span>
             </div>
+          </div>
+        </section>
+
+        <section id="stats" className="lp-section lp-shell">
+          <div className="lp-section-top reveal-on-scroll">
+            <p className="lp-eyebrow">STATISTICS AND ANALYTICS</p>
+            <h2>Live service metrics from real product usage.</h2>
+          </div>
+          <div className="lp-grid-cards">
+            <article className="lp-card reveal-on-scroll">
+              <h3>Registered users</h3>
+              <p className="lp-stat-value">{stats.usersCount.toLocaleString("en-US")}</p>
+              <p>Total accounts created in the platform.</p>
+            </article>
+            <article className="lp-card reveal-on-scroll">
+              <h3>Successful chats</h3>
+              <p className="lp-stat-value">
+                {stats.successfulChatsCount.toLocaleString("en-US")}
+              </p>
+              <p>Dialog responses returned without errors.</p>
+            </article>
+            <article className="lp-card reveal-on-scroll">
+              <h3>Responses per second</h3>
+              <p className="lp-stat-value">{stats.responsesPerSecond.toFixed(2)}</p>
+              <p>Calculated as 1000 / avgResponseMs over recent requests.</p>
+            </article>
           </div>
         </section>
 
@@ -284,6 +319,7 @@ export default function HomePage() {
             <a href="/login">Logg inn</a>
             <a href="/register">Registrer</a>
             <a href="/chat">Chat</a>
+            <a href="/pricing">Subscriptions</a>
           </div>
         </div>
       </footer>
@@ -292,6 +328,4 @@ export default function HomePage() {
     </>
   );
 }
-
-
 

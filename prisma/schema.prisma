@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Plan {
+  FREE
+  PRO
+  ULTRA
+}
+
+enum SubscriptionStatus {
+  NONE
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model User {
+  id                 String             @id @db.Uuid
+  email              String             @unique
+  name               String?
+  passwordHash       String             @map("password_hash")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  plan               Plan               @default(FREE)
+  stripeCustomerId   String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?          @map("stripe_subscription_id")
+  subscriptionStatus SubscriptionStatus @default(NONE) @map("subscription_status")
+  currentPeriodEnd   DateTime?          @map("current_period_end")
+  dailyMessageCount  Int                @default(0) @map("daily_message_count")
+  dailyResetAt       DateTime           @default(now()) @map("daily_reset_at")
+  monthlyMessageCount Int               @default(0) @map("monthly_message_count")
+  monthResetAt       DateTime           @default(now()) @map("month_reset_at")
+  chatMetrics        ChatMetric[]
+
+  @@map("users")
+}
+
+model ChatMetric {
+  id         String   @id @db.Uuid
+  userId     String?  @map("user_id") @db.Uuid
+  responseMs Int      @map("response_ms")
+  success    Boolean
+  createdAt  DateTime @default(now()) @map("created_at")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("chat_metrics")
+}
