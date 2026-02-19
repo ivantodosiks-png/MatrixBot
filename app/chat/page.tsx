@@ -59,7 +59,7 @@ export default function ChatPage() {
             </div>
             <div className="status-row">
               <span>Model</span>
-              <span>gpt-4o-mini</span>
+              <span>gpt-5.2</span>
             </div>
             <div className="status-row">
               <span>API</span>
