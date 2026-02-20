@@ -11,10 +11,16 @@ export const runtime = "nodejs";
 const OPENAI_API_URL =
   process.env.OPENAI_API_URL || "https://api.openai.com/v1/chat/completions";
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-const SYSTEM_PROMPT = String(
-  process.env.SYSTEM_PROMPT ??
-    "You are a helpful assistant. Reply in the same language as the user. Keep default replies short (1-3 concise paragraphs) unless the user asks for details."
-).trim();
+const DEFAULT_SYSTEM_PROMPT =
+  "You are a helpful programming assistant. Reply in English by default. Keep default replies short (1-3 concise paragraphs) unless the user asks for details. If the user explicitly asks for another language, you may switch to that language.";
+const rawSystemPrompt = String(process.env.SYSTEM_PROMPT ?? "").trim();
+const hasNorwegianLanguageInstruction = /\bnorsk\b|\bbokm[aå]l\b|du er en/i.test(
+  rawSystemPrompt
+);
+const SYSTEM_PROMPT =
+  rawSystemPrompt && !hasNorwegianLanguageInstruction
+    ? rawSystemPrompt
+    : DEFAULT_SYSTEM_PROMPT;
 const DEFAULT_MAX_TOKENS = Number(process.env.MAX_TOKENS ?? 450);
 const LIMIT_EXCEEDED_MESSAGE =
   "\u041b\u0438\u043c\u0438\u0442 \u0438\u0441\u0447\u0435\u0440\u043f\u0430\u043d, \u043f\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u043d\u0430 Pro/Ultra";

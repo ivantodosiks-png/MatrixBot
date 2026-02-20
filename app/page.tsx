@@ -413,8 +413,8 @@ export default async function HomePage() {
             <span>(c) Matrix GPT</span>
           </div>
           <div className="lp-footer-links">
-            <a href="/login">Logg inn</a>
-            <a href="/register">Registrer</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
             <a href="/chat">Chat</a>
             <a href="/pricing">Subscriptions</a>
           </div>
