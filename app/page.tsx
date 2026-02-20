@@ -92,15 +92,6 @@ export default async function HomePage() {
               <span className="lp-online-dot" aria-hidden="true" />
               Matrix online
             </span>
-            {isLoggedIn ? (
-              <a href="/pricing" className="lp-btn lp-btn-secondary">
-                Subscriptions
-              </a>
-            ) : (
-              <a href="/login" className="lp-btn lp-btn-secondary">
-                Log in
-              </a>
-            )}
             <a href="/chat" className="lp-btn lp-btn-primary">
               Open chat
             </a>
@@ -118,15 +109,20 @@ export default async function HomePage() {
               fixes, explanations, and fast technical decisions in one place.
             </p>
             <div className="lp-hero-cta">
-              <a className="lp-btn lp-btn-primary" href="/chat">
-                {isLoggedIn ? "Open chat" : "Login"}
-              </a>
-              <a
-                className="lp-btn lp-btn-secondary"
-                href={isLoggedIn ? "/chat" : "/register"}
-              >
-                {isLoggedIn ? "Open site" : "Create account"}
-              </a>
+              {isLoggedIn ? (
+                <a className="lp-btn lp-btn-primary" href="/chat">
+                  Open chat
+                </a>
+              ) : (
+                <>
+                  <a className="lp-btn lp-btn-primary" href="/login">
+                    Login
+                  </a>
+                  <a className="lp-btn lp-btn-secondary" href="/register">
+                    Register
+                  </a>
+                </>
+              )}
             </div>
             <div className="lp-metrics">
               <div className="lp-metric">
