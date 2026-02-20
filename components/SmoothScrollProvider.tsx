@@ -1,7 +1,8 @@
 "use client";
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect } from "react";
 import Lenis, { type LenisOptions } from "lenis";
+import "lenis/dist/lenis.css";
 
 type SmoothScrollProviderProps = {
   children: ReactNode;
@@ -20,25 +21,14 @@ export default function SmoothScrollProvider({
   smoothWheel = true,
   smoothTouch = true,
 }: SmoothScrollProviderProps) {
-  const [reducedMotion, setReducedMotion] = useState(false);
-
   useEffect(() => {
-    if (typeof window === "undefined" || !("matchMedia" in window)) {
+    if (typeof window === "undefined") {
       return;
     }
 
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReducedMotion(media.matches);
-    update();
-
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || reducedMotion) {
-      return;
-    }
+    const root = window.document.documentElement;
+    root.classList.remove("app-preload");
+    root.classList.add("app-mounted");
 
     const previousScrollRestoration = window.history.scrollRestoration;
     window.history.scrollRestoration = "auto";
@@ -65,7 +55,7 @@ export default function SmoothScrollProvider({
       lenis.destroy();
       window.history.scrollRestoration = previousScrollRestoration;
     };
-  }, [lerp, reducedMotion, smoothTouch, smoothWheel, touchMultiplier, wheelMultiplier]);
+  }, [lerp, smoothTouch, smoothWheel, touchMultiplier, wheelMultiplier]);
 
   return <>{children}</>;
 }

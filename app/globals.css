@@ -19,3 +19,50 @@ body::-webkit-scrollbar {
   height: 0;
   display: none;
 }
+
+html.app-preload body .lp-header,
+html.app-preload body .lp-main,
+html.app-preload body .lp-footer,
+html.app-preload body .pricing-shell,
+html.app-preload body .checkout-shell,
+html.app-preload body .contact-shell,
+html.app-preload body .account-shell,
+html.app-preload body .settings-shell {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+}
+
+html.app-mounted body .lp-header,
+html.app-mounted body .lp-main,
+html.app-mounted body .lp-footer,
+html.app-mounted body .pricing-shell,
+html.app-mounted body .checkout-shell,
+html.app-mounted body .contact-shell,
+html.app-mounted body .account-shell,
+html.app-mounted body .settings-shell {
+  animation: app-enter 620ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+html.app-mounted body .lp-main,
+html.app-mounted body .pricing-shell,
+html.app-mounted body .checkout-shell,
+html.app-mounted body .contact-shell,
+html.app-mounted body .account-shell,
+html.app-mounted body .settings-shell {
+  animation-delay: 70ms;
+}
+
+html.app-mounted body .lp-footer {
+  animation-delay: 120ms;
+}
+
+@keyframes app-enter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}

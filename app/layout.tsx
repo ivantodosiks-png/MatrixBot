@@ -13,11 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="app-preload">
       <body>
         <SmoothScrollProvider
           lerp={0.09}
-          wheelMultiplier={1}
+          wheelMultiplier={0.9}
           touchMultiplier={1}
           smoothWheel
           smoothTouch
