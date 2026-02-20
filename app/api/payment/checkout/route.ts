@@ -16,7 +16,17 @@ type RequestBody = {
 };
 
 function planToAmount(plan: "pro" | "ultra") {
-  return plan === "pro" ? "9.99 EUR / month" : "19.99 EUR / month";
+  return plan === "pro" ? 9.99 : 19.99;
+}
+
+function normalizeDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function maskCardNumber(cardNumber: string) {
+  const digits = normalizeDigits(cardNumber);
+  const tail = digits.slice(-4) || "0000";
+  return `Card **** **** **** ${tail}`;
 }
 
 export async function POST(request: Request) {
@@ -33,10 +43,12 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as RequestBody;
     const plan = body.plan;
-    const cardNumber = String(body.cardNumber ?? "").trim();
+    const cardNumberRaw = String(body.cardNumber ?? "").trim();
     const expiry = String(body.expiry ?? "").trim();
-    const cvc = String(body.cvc ?? "").trim();
+    const cvcRaw = String(body.cvc ?? "").trim();
     const cardholderName = String(body.cardholderName ?? "").trim();
+    const cardNumber = normalizeDigits(cardNumberRaw);
+    const cvc = normalizeDigits(cvcRaw);
 
     if (plan !== "pro" && plan !== "ultra") {
       return NextResponse.json(
@@ -45,30 +57,30 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!cardholderName) {
+    if (!cardholderName || cardholderName.length < 2 || cardholderName.length > 80) {
       return NextResponse.json(
-        { error: { message: "Cardholder name is required" } },
+        { error: { message: "Cardholder name is invalid" } },
         { status: 400 }
       );
     }
 
-    if (!cardNumber) {
+    if (!/^\d{12,19}$/.test(cardNumber)) {
       return NextResponse.json(
-        { error: { message: "Card number is required" } },
+        { error: { message: "Card number is invalid" } },
         { status: 400 }
       );
     }
 
-    if (!expiry) {
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
       return NextResponse.json(
-        { error: { message: "Expiry is required" } },
+        { error: { message: "Expiry must be in MM/YY format" } },
         { status: 400 }
       );
     }
 
-    if (!cvc) {
+    if (!/^\d{3,4}$/.test(cvc)) {
       return NextResponse.json(
-        { error: { message: "CVC is required" } },
+        { error: { message: "CVC is invalid" } },
         { status: 400 }
       );
     }
@@ -81,11 +93,15 @@ export async function POST(request: Request) {
       );
     }
 
+    const amount = planToAmount(plan);
     const receiptId = crypto.randomUUID();
     await sendReceiptEmail({
       to: user.email,
+      customerName: cardholderName,
       planName: plan.toUpperCase(),
-      amountLabel: planToAmount(plan),
+      amountValue: amount,
+      currency: "EUR",
+      paymentMethod: maskCardNumber(cardNumber),
       receiptId,
       purchasedAt: new Date(),
     });

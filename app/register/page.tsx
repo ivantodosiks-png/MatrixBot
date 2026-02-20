@@ -99,11 +99,6 @@ export default function RegisterPage() {
       <main className="auth-shell">
         <section className="auth-panel">
           <div className="auth-logo">
-            <img
-              src="/assets/img/brand/logo-icon-primary.png"
-              alt=""
-              className="auth-logo-mark"
-            />
             <span>MATRIX GPT</span>
           </div>
           <div className="auth-title">Register</div>
