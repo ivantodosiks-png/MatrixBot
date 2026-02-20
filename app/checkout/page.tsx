@@ -49,8 +49,8 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
             </a>
           </div>
           <p className="checkout-subtitle">
-            Complete your purchase below. After payment you will see a success message
-            and receive a receipt by email.
+            Demo checkout page: enter any data, click buy, and we will send a receipt
+            to your email.
           </p>
           <CheckoutForm plan={plan} email={user.email} />
         </section>

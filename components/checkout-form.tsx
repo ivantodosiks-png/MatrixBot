@@ -17,17 +17,6 @@ type ApiResponse = {
   };
 };
 
-function normalizeCardDisplay(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 19);
-  return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
-}
-
-function normalizeExpiryDisplay(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-}
-
 export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
   const [cardholderName, setCardholderName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -114,7 +103,6 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
           value={cardholderName}
           onChange={(event) => setCardholderName(event.target.value)}
           required
-          minLength={2}
           autoComplete="cc-name"
         />
       </label>
@@ -124,11 +112,10 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
         <input
           className="checkout-input"
           type="text"
-          inputMode="numeric"
-          autoComplete="cc-number"
+          autoComplete="off"
           placeholder="4242 4242 4242 4242"
           value={cardNumber}
-          onChange={(event) => setCardNumber(normalizeCardDisplay(event.target.value))}
+          onChange={(event) => setCardNumber(event.target.value)}
           required
         />
       </label>
@@ -139,11 +126,10 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
           <input
             className="checkout-input"
             type="text"
-            inputMode="numeric"
-            autoComplete="cc-exp"
+            autoComplete="off"
             placeholder="12/30"
             value={expiry}
-            onChange={(event) => setExpiry(normalizeExpiryDisplay(event.target.value))}
+            onChange={(event) => setExpiry(event.target.value)}
             required
           />
         </label>
@@ -152,12 +138,11 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
           CVC
           <input
             className="checkout-input"
-            type="password"
-            inputMode="numeric"
-            autoComplete="cc-csc"
+            type="text"
+            autoComplete="off"
             placeholder="123"
             value={cvc}
-            onChange={(event) => setCvc(event.target.value.replace(/\D/g, "").slice(0, 4))}
+            onChange={(event) => setCvc(event.target.value)}
             required
           />
         </label>
