@@ -8,6 +8,10 @@ import { authOptions } from "@/lib/auth";
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const isLoggedIn = Boolean(session?.user?.id);
+  const userDisplayName =
+    session?.user?.name?.trim() ||
+    session?.user?.email?.split("@")[0] ||
+    "friend";
   const stats = await getPublicStats(120).catch(() => ({
     usersCount: 0,
     successfulChatsCount: 0,
@@ -92,9 +96,6 @@ export default async function HomePage() {
               <span className="lp-online-dot" aria-hidden="true" />
               Matrix online
             </span>
-            <a href="/chat" className="lp-btn lp-btn-primary">
-              Open chat
-            </a>
           </div>
         </div>
       </header>
@@ -103,6 +104,11 @@ export default async function HomePage() {
         <section className="lp-hero lp-shell">
           <div className="lp-hero-copy reveal-on-scroll">
             <p className="lp-eyebrow">NEON INTELLIGENCE PLATFORM</p>
+            {isLoggedIn ? (
+              <p className="mb-3 text-sm text-cyan-100/85">
+                Привет, рады снова тебя видеть, {userDisplayName}.
+              </p>
+            ) : null}
             <h1>AI coding bot that helps you build, debug, and ship faster.</h1>
             <p className="lp-lead">
               Matrix assistant focused on programming tasks: code generation,
