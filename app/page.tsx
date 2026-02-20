@@ -89,7 +89,8 @@ export default async function HomePage() {
           </nav>
           <div className="lp-header-cta">
             <span className="lp-online-pill">
-              {isLoggedIn ? "Matrix skriver..." : "Core online"}
+              <span className="lp-online-dot" aria-hidden="true" />
+              Matrix online
             </span>
             {isLoggedIn ? (
               <a href="/account" className="lp-btn lp-btn-secondary">
@@ -111,14 +112,20 @@ export default async function HomePage() {
         <section className="lp-hero lp-shell">
           <div className="lp-hero-copy reveal-on-scroll">
             <p className="lp-eyebrow">NEON INTELLIGENCE PLATFORM</p>
-            <h1>Matrix-grade AI assistant for focused, fast decisions.</h1>
+            <h1>AI coding bot that helps you build, debug, and ship faster.</h1>
             <p className="lp-lead">
-              Premium AI workspace with secure flows, low-friction UX, and a
-              clean neon visual system built for modern teams.
+              Matrix assistant focused on programming tasks: code generation,
+              fixes, explanations, and fast technical decisions in one place.
             </p>
             <div className="lp-hero-cta lp-hero-cta-center">
               <a className="lp-btn lp-btn-primary" href="/chat">
-                Start with Matrix
+                {isLoggedIn ? "Open chat" : "Login"}
+              </a>
+              <a
+                className="lp-btn lp-btn-secondary"
+                href={isLoggedIn ? "/chat" : "/register"}
+              >
+                {isLoggedIn ? "Open site" : "Create account"}
               </a>
             </div>
             <div className="lp-metrics">
