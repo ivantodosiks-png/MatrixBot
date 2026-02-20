@@ -22,6 +22,54 @@ export default async function HomePage() {
         <i />
         <i />
       </div>
+      <div className="lp-scroll-pod" id="lpScrollPod" aria-hidden="true">
+        <div className="lp-scroll-pod-body">
+          <div className="lp-scroll-pod-trail" />
+          <svg
+            className="lp-scroll-pod-ship"
+            viewBox="0 0 210 110"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="lpPodShell" x1="18" y1="55" x2="180" y2="55" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#6FE8FF" />
+                <stop offset="0.55" stopColor="#73D1FF" />
+                <stop offset="1" stopColor="#4D88E6" />
+              </linearGradient>
+              <linearGradient id="lpPodCore" x1="80" y1="34" x2="160" y2="76" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#D5F7FF" />
+                <stop offset="1" stopColor="#7AC7FF" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M22 55C38 38 73 25 121 24C161 24 184 35 194 55C184 75 161 86 121 86C73 85 38 72 22 55Z"
+              fill="url(#lpPodShell)"
+              fillOpacity="0.2"
+              stroke="url(#lpPodShell)"
+              strokeWidth="2.4"
+            />
+            <path
+              d="M57 55C67 45 87 38 115 38C137 38 154 43 163 55C154 67 137 72 115 72C87 72 67 65 57 55Z"
+              fill="url(#lpPodCore)"
+              fillOpacity="0.26"
+              stroke="#BEEBFF"
+              strokeOpacity="0.85"
+              strokeWidth="1.7"
+            />
+            <path
+              d="M163 55L194 55M48 45L76 45M48 65L76 65M94 31L113 31M94 79L113 79"
+              stroke="#8CD8FF"
+              strokeOpacity="0.72"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <circle cx="84" cy="55" r="4.5" fill="#BDEBFF" fillOpacity="0.75" />
+          </svg>
+          <div className="lp-scroll-pod-glow" />
+          <div className="lp-scroll-pod-glitch" />
+        </div>
+      </div>
 
       <header className="lp-header">
         <div className="lp-shell">

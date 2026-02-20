@@ -2068,6 +2068,95 @@ select {
   animation-delay: 4.1s;
 }
 
+.lp-scroll-pod {
+  --pod-x: -220px;
+  --pod-y: 42vh;
+  --pod-angle: 0deg;
+  --pod-opacity: 0;
+  --pod-trail: 0.75;
+  --pod-boost: 0.9;
+  --pod-glitch: 0.08;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 18;
+  opacity: var(--pod-opacity);
+  transform: translate3d(var(--pod-x), var(--pod-y), 0) rotate(var(--pod-angle));
+  transform-origin: center;
+  transition: opacity 0.18s linear;
+}
+
+.lp-scroll-pod-body {
+  position: relative;
+  width: 210px;
+  height: 110px;
+  margin-left: -105px;
+  margin-top: -55px;
+  filter: drop-shadow(0 0 12px rgba(117, 211, 255, 0.42));
+}
+
+.lp-scroll-pod-trail {
+  position: absolute;
+  left: -190px;
+  top: 50%;
+  width: 188px;
+  height: 14px;
+  transform: translateY(-50%);
+  opacity: calc(var(--pod-trail) * 0.95);
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(109, 212, 255, 0) 0%, rgba(109, 212, 255, 0.42) 45%, rgba(109, 212, 255, 0.96) 100%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(147, 225, 255, 0.86) 0 8px,
+      rgba(147, 225, 255, 0.06) 8px 16px
+    );
+  box-shadow: 0 0 22px rgba(105, 196, 255, 0.42);
+  filter: blur(0.35px);
+  animation: lp-pod-trace 0.72s linear infinite;
+}
+
+.lp-scroll-pod-ship {
+  position: relative;
+  width: 210px;
+  height: 110px;
+  display: block;
+  filter:
+    drop-shadow(0 0 8px rgba(120, 205, 255, 0.36))
+    drop-shadow(0 0 20px rgba(100, 185, 255, 0.22));
+  animation: lp-pod-hum 1.4s ease-in-out infinite;
+}
+
+.lp-scroll-pod-glow {
+  position: absolute;
+  left: -112px;
+  top: 50%;
+  width: 106px;
+  height: 24px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  opacity: calc(var(--pod-boost) * 0.62);
+  background: radial-gradient(circle at 90% 50%, rgba(125, 215, 255, 0.85), rgba(125, 215, 255, 0));
+  filter: blur(6px);
+}
+
+.lp-scroll-pod-glitch {
+  position: absolute;
+  inset: 0;
+  opacity: var(--pod-glitch);
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(151, 228, 255, 0) 0 6px,
+    rgba(151, 228, 255, 0.18) 6px 7px,
+    rgba(151, 228, 255, 0) 7px 14px
+  );
+  mix-blend-mode: screen;
+  animation: lp-pod-glitch 4.1s steps(2, end) infinite;
+}
+
 .lp-online-pill {
   border-radius: 999px;
   padding: 8px 11px;
@@ -2271,6 +2360,45 @@ select {
   }
 }
 
+@keyframes lp-pod-trace {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 0 0, 66px 0;
+  }
+}
+
+@keyframes lp-pod-hum {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0.6px, -0.8px, 0) scale(1.008);
+  }
+}
+
+@keyframes lp-pod-glitch {
+  0%,
+  88%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    clip-path: inset(0 0 0 0);
+    opacity: var(--pod-glitch);
+  }
+  90% {
+    transform: translate3d(2px, 0, 0);
+    clip-path: inset(18% 0 46% 0);
+    opacity: calc(var(--pod-glitch) * 1.4);
+  }
+  94% {
+    transform: translate3d(-2px, 1px, 0);
+    clip-path: inset(58% 0 20% 0);
+    opacity: calc(var(--pod-glitch) * 1.2);
+  }
+}
+
 @keyframes card-sway {
   0%,
   100% {
@@ -2304,6 +2432,16 @@ select {
   .lp-step,
   .lp-showcase-card {
     animation-duration: 7s;
+  }
+  .lp-scroll-pod-body {
+    transform: scale(0.76);
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-scroll-pod {
+    display: none;
   }
 }
 
