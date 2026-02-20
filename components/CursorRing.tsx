@@ -16,7 +16,7 @@ function isInteractiveTarget(target: EventTarget | null) {
   );
 }
 
-export default function CursorRing({ lerp = 0.22, size = 34 }: CursorRingProps) {
+export default function CursorRing({ lerp = 0.42, size = 34 }: CursorRingProps) {
   const ringRef = useRef<HTMLDivElement | null>(null);
   const [enabled, setEnabled] = useState(false);
 
@@ -78,10 +78,10 @@ export default function CursorRing({ lerp = 0.22, size = 34 }: CursorRingProps) 
 
     const applyTargetScale = () => {
       if (isPressed) {
-        target.scale = 0.88;
+        target.scale = 0.92;
         return;
       }
-      target.scale = isHoveringInteractive ? 1.12 : 1;
+      target.scale = isHoveringInteractive ? 1.06 : 1;
     };
 
     const setPressed = (next: boolean) => {
@@ -102,7 +102,7 @@ export default function CursorRing({ lerp = 0.22, size = 34 }: CursorRingProps) 
     const animate = () => {
       current.x += (target.x - current.x) * lerp;
       current.y += (target.y - current.y) * lerp;
-      current.scale += (target.scale - current.scale) * 0.35;
+      current.scale += (target.scale - current.scale) * 0.55;
 
       ring.style.transform = `translate3d(${current.x}px, ${current.y}px, 0) translate3d(-50%, -50%, 0) scale(${current.scale})`;
       rafId = window.requestAnimationFrame(animate);

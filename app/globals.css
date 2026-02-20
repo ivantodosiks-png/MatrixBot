@@ -82,9 +82,9 @@ html.app-mounted body .lp-footer {
     0 0 30px rgba(90, 199, 255, 0.5),
     inset 0 0 18px rgba(113, 237, 255, 0.2);
   transition:
-    opacity 80ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease;
+    opacity 40ms linear,
+    border-color 90ms linear,
+    box-shadow 90ms linear;
   transform: translate3d(-9999px, -9999px, 0);
   will-change: transform, opacity, box-shadow;
   mix-blend-mode: screen;
@@ -135,19 +135,13 @@ html.app-mounted body .lp-footer {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  html.cursor-ring-enabled,
-  html.cursor-ring-enabled body,
-  html.cursor-ring-enabled * {
-    cursor: none !important;
-  }
-
   html.cursor-ring-enabled .lp-btn,
   html.cursor-ring-enabled button,
   html.cursor-ring-enabled a[role="button"] {
     transition:
-      transform 180ms ease,
-      box-shadow 220ms ease,
-      border-color 220ms ease;
+      transform 110ms linear,
+      box-shadow 120ms linear,
+      border-color 120ms linear;
     will-change: transform, box-shadow;
   }
 
