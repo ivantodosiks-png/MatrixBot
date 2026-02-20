@@ -40,17 +40,24 @@ function setupInertialWheelScroll(element: HTMLElement) {
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReduced) return () => undefined;
 
-  let target = element.scrollTop;
+  let velocity = 0;
   let frameId = 0;
 
   const tick = () => {
-    const diff = target - element.scrollTop;
-    if (Math.abs(diff) < 0.45) {
-      element.scrollTop = target;
+    if (Math.abs(velocity) < 0.1) {
+      velocity = 0;
       frameId = 0;
       return;
     }
-    element.scrollTop += diff * 0.18;
+    const max = Math.max(0, element.scrollHeight - element.clientHeight);
+    const next = Math.max(0, Math.min(max, element.scrollTop + velocity));
+    element.scrollTop = next;
+    velocity *= 0.82;
+
+    if (next <= 0 || next >= max) {
+      velocity *= 0.65;
+    }
+
     frameId = window.requestAnimationFrame(tick);
   };
 
@@ -58,28 +65,24 @@ function setupInertialWheelScroll(element: HTMLElement) {
     const max = Math.max(0, element.scrollHeight - element.clientHeight);
     if (max <= 0) return;
 
-    const next = Math.max(0, Math.min(max, target + event.deltaY));
-    if (next === target) return;
+    const atTop = element.scrollTop <= 0;
+    const atBottom = element.scrollTop >= max - 0.5;
+    if ((atTop && event.deltaY < 0) || (atBottom && event.deltaY > 0)) {
+      return;
+    }
 
     event.preventDefault();
-    target = next;
+    velocity += event.deltaY * 0.6;
+    velocity = Math.max(-70, Math.min(70, velocity));
     if (!frameId) {
       frameId = window.requestAnimationFrame(tick);
     }
   };
 
-  const onScroll = () => {
-    if (!frameId) {
-      target = element.scrollTop;
-    }
-  };
-
   element.addEventListener("wheel", onWheel, { passive: false });
-  element.addEventListener("scroll", onScroll, { passive: true });
 
   return () => {
     element.removeEventListener("wheel", onWheel);
-    element.removeEventListener("scroll", onScroll);
     if (frameId) {
       window.cancelAnimationFrame(frameId);
     }
@@ -525,7 +528,11 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                 </div>
               </div>
 
-              <div ref={sidebarListRef} className="chat-scroll-area space-y-2 overflow-y-auto pr-1">
+              <div
+                ref={sidebarListRef}
+                data-lenis-prevent
+                className="chat-scroll-area space-y-2 overflow-y-auto pr-1"
+              >
                 {conversations.map((conversation) => {
                   const active = conversation.id === activeConversationId;
                   return (
@@ -623,6 +630,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
 
           <div
             ref={messagesContainerRef}
+            data-lenis-prevent
             className="chat-scroll-area relative min-h-0 flex-1 overflow-y-auto px-3 py-4 md:px-5 md:py-5"
           >
             {!activeConversation || activeConversation.messages.length === 0 ? (

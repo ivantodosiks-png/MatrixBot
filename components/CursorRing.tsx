@@ -26,14 +26,13 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     const root = document.documentElement;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const anyFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
-    const anyCoarsePointer = window.matchMedia("(any-pointer: coarse)");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const updateEnabled = () => {
       const hasFine = finePointer.matches || anyFinePointer.matches;
-      const coarseOnly = anyCoarsePointer.matches && !hasFine;
-      const likelyDesktop = window.innerWidth >= 1024;
-      const next = !reducedMotion.matches && !coarseOnly && (hasFine || likelyDesktop);
+      const likelyDesktop = window.innerWidth >= 700;
+      const hasTouch = navigator.maxTouchPoints > 0;
+      const likelyTouchOnlyMobile = hasTouch && !hasFine && window.innerWidth < 700;
+      const next = !likelyTouchOnlyMobile && (hasFine || likelyDesktop);
       setEnabled(next);
       root.classList.toggle("cursor-ring-enabled", next);
       if (!next) {
@@ -44,15 +43,11 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     updateEnabled();
     finePointer.addEventListener("change", updateEnabled);
     anyFinePointer.addEventListener("change", updateEnabled);
-    anyCoarsePointer.addEventListener("change", updateEnabled);
-    reducedMotion.addEventListener("change", updateEnabled);
     window.addEventListener("resize", updateEnabled, { passive: true });
 
     return () => {
       finePointer.removeEventListener("change", updateEnabled);
       anyFinePointer.removeEventListener("change", updateEnabled);
-      anyCoarsePointer.removeEventListener("change", updateEnabled);
-      reducedMotion.removeEventListener("change", updateEnabled);
       window.removeEventListener("resize", updateEnabled);
       root.classList.remove("cursor-ring-enabled", "cursor-ring-clicking");
     };
@@ -140,6 +135,9 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
       const hovered = document.elementFromPoint(event.clientX, event.clientY);
       setHoveringInteractive(isInteractiveTarget(hovered));
     };
+    const onMouseEnter = () => {
+      setVisible(true);
+    };
 
     const onPointerLeave = () => {
       setVisible(false);
@@ -148,6 +146,7 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     };
 
     rafId = window.requestAnimationFrame(animate);
+    setVisible(true);
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown, { passive: true });
@@ -155,6 +154,7 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     window.addEventListener("pointercancel", onPointerUp, { passive: true });
     window.addEventListener("pointerleave", onPointerLeave, { passive: true });
     window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("mouseenter", onMouseEnter, { passive: true });
     window.addEventListener("mousedown", onMouseDown, { passive: true });
     window.addEventListener("mouseup", onPointerUp, { passive: true });
     window.addEventListener("blur", onPointerLeave);
@@ -167,6 +167,7 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
       window.removeEventListener("pointercancel", onPointerUp);
       window.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseenter", onMouseEnter);
       window.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mouseup", onPointerUp);
       window.removeEventListener("blur", onPointerLeave);
@@ -184,6 +185,7 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
       aria-hidden="true"
     >
       <span className="cursor-ring__particles" />
+      <span className="cursor-ring__core" />
     </div>
   );
 }

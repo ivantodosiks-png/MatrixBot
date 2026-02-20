@@ -75,18 +75,19 @@ html.app-mounted body .lp-footer {
   border-radius: 9999px;
   pointer-events: none;
   opacity: 0;
-  border: 1px solid rgba(125, 224, 255, 0.7);
-  background: radial-gradient(circle at 50% 50%, rgba(110, 210, 255, 0.08), rgba(110, 210, 255, 0) 70%);
+  border: 1.2px solid rgba(128, 231, 255, 0.88);
+  background: radial-gradient(circle at 50% 50%, rgba(113, 214, 255, 0.14), rgba(113, 214, 255, 0) 72%);
   box-shadow:
-    0 0 0 1px rgba(106, 193, 255, 0.2),
-    0 0 22px rgba(78, 183, 255, 0.34),
-    inset 0 0 14px rgba(101, 230, 255, 0.12);
+    0 0 0 1px rgba(119, 212, 255, 0.25),
+    0 0 30px rgba(90, 199, 255, 0.5),
+    inset 0 0 18px rgba(113, 237, 255, 0.2);
   transition:
-    opacity 180ms ease,
+    opacity 120ms ease,
     border-color 220ms ease,
     box-shadow 220ms ease;
   transform: translate3d(-9999px, -9999px, 0);
   will-change: transform, opacity, box-shadow;
+  mix-blend-mode: screen;
 }
 
 .cursor-ring[data-visible="true"] {
@@ -94,11 +95,11 @@ html.app-mounted body .lp-footer {
 }
 
 .cursor-ring[data-hover="true"] {
-  border-color: rgba(143, 232, 255, 0.88);
+  border-color: rgba(163, 240, 255, 1);
   box-shadow:
-    0 0 0 1px rgba(125, 229, 255, 0.28),
-    0 0 26px rgba(92, 210, 255, 0.46),
-    inset 0 0 18px rgba(102, 233, 255, 0.18);
+    0 0 0 1px rgba(136, 235, 255, 0.34),
+    0 0 36px rgba(102, 220, 255, 0.62),
+    inset 0 0 22px rgba(120, 239, 255, 0.26);
 }
 
 .cursor-ring[data-pressed="true"] {
@@ -117,6 +118,20 @@ html.app-mounted body .lp-footer {
     radial-gradient(circle at 82% 70%, rgba(139, 233, 255, 0.32) 0 1px, transparent 2px),
     radial-gradient(circle at 24% 82%, rgba(112, 218, 255, 0.34) 0 1px, transparent 2px);
   filter: blur(0.25px);
+}
+
+.cursor-ring__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translate3d(-50%, -50%, 0);
+  border-radius: 9999px;
+  background: rgba(180, 244, 255, 0.95);
+  box-shadow:
+    0 0 10px rgba(109, 222, 255, 0.9),
+    0 0 18px rgba(91, 195, 255, 0.6);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -154,6 +169,6 @@ html.app-mounted body .lp-footer {
 
 @media (prefers-reduced-motion: reduce) {
   .cursor-ring {
-    display: none !important;
+    transition: none;
   }
 }
