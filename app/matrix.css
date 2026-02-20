@@ -3189,3 +3189,138 @@ body.matrix-exit-page::after {
     transform: translateY(8%);
   }
 }
+
+/* Mobile support hardening */
+@media (max-width: 900px) {
+  .lp-shell {
+    width: min(1060px, calc(100vw - 24px));
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    font-size: 15px;
+  }
+
+  body.chat-page {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  .chat-page .chat-scroll-area {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .lp-header .lp-shell {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .lp-logo {
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+  }
+
+  .lp-nav {
+    width: 100%;
+    justify-self: stretch;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .lp-nav::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  .lp-nav a {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 0.82rem;
+  }
+
+  .lp-hero-copy,
+  .lp-terminal,
+  .lp-card,
+  .lp-step,
+  .lp-faq-item,
+  .lp-final,
+  .lp-showcase-main,
+  .lp-showcase-card {
+    border-radius: 14px;
+  }
+
+  .lp-hero-copy {
+    padding: 16px;
+  }
+
+  .lp-hero-copy h1 {
+    font-size: clamp(1.45rem, 8.8vw, 2rem);
+    line-height: 1.14;
+  }
+
+  .lp-lead {
+    font-size: 0.9rem;
+  }
+
+  .lp-hero-cta .lp-btn,
+  .lp-final-cta .lp-btn,
+  .lp-store-badge {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .lp-final {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .lp-footer {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom));
+  }
+
+  .lp-footer-links {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+}
+
+@media (max-width: 520px) {
+  .lp-shell {
+    width: min(1060px, calc(100vw - 16px));
+  }
+
+  .lp-main {
+    gap: 44px;
+    padding-bottom: 28px;
+  }
+
+  .lp-header {
+    padding-top: 10px;
+  }
+
+  .lp-section {
+    padding-top: 0;
+  }
+
+  .auth-shell {
+    width: min(520px, 94vw);
+  }
+
+  .auth-panel {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .auth-title {
+    font-size: 1.2rem;
+  }
+}

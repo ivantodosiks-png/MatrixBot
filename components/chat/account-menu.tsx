@@ -118,7 +118,7 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
     <Menu as="div" className="relative">
       {({ open }) => (
         <>
-          <MenuButton className="group flex items-center gap-3 rounded-2xl border border-cyan-300/25 bg-slate-900/70 px-2 py-2 text-left text-cyan-50 shadow-[0_0_0_1px_rgba(125,211,252,0.08),0_10px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl transition hover:border-cyan-200/45 hover:bg-slate-900/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">
+          <MenuButton className="group flex max-w-[70vw] items-center gap-3 rounded-2xl border border-cyan-300/25 bg-slate-900/70 px-2 py-2 text-left text-cyan-50 shadow-[0_0_0_1px_rgba(125,211,252,0.08),0_10px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl transition hover:border-cyan-200/45 hover:bg-slate-900/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 sm:max-w-none">
             <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/25 to-blue-400/20 font-semibold tracking-wide text-cyan-100 shadow-[0_0_18px_rgba(56,189,248,0.32)]">
               {avatarUrl ? (
                 <img src={avatarUrl} alt={`${name} avatar`} className="h-full w-full object-cover" />
@@ -149,7 +149,7 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -8, scale: 0.98 }}
                 anchor="bottom end"
-                className="z-40 mt-3 w-64 origin-top-right rounded-2xl border border-cyan-200/20 bg-slate-950/78 p-2 text-sm text-cyan-50 shadow-[0_20px_48px_rgba(2,6,23,0.7),0_0_0_1px_rgba(103,232,249,0.12)] backdrop-blur-2xl focus:outline-none"
+                className="z-40 mt-3 w-[min(16rem,calc(100vw-1rem))] origin-top-right rounded-2xl border border-cyan-200/20 bg-slate-950/78 p-2 text-sm text-cyan-50 shadow-[0_20px_48px_rgba(2,6,23,0.7),0_0_0_1px_rgba(103,232,249,0.12)] backdrop-blur-2xl focus:outline-none"
               >
                 <div className="mb-2 rounded-xl border border-cyan-200/10 bg-slate-900/55 p-3">
                   <div className="flex items-center gap-3">
@@ -245,7 +245,7 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[80] flex items-start justify-end bg-slate-950/55 p-4 backdrop-blur-[2px] md:p-6"
+                className="fixed inset-0 z-[80] flex items-end justify-center bg-slate-950/55 p-3 backdrop-blur-[2px] sm:items-start sm:justify-end sm:p-6"
                 onClick={() => setActiveModal(null)}
               >
                 <motion.div
@@ -253,7 +253,7 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.98 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="relative w-full max-w-sm rounded-2xl border border-cyan-200/25 bg-slate-950/88 p-4 text-cyan-50 shadow-[0_26px_60px_rgba(2,6,23,0.78),0_0_0_1px_rgba(103,232,249,0.15)] backdrop-blur-2xl"
+                  className="relative max-h-[90dvh] w-full max-w-sm overflow-y-auto rounded-2xl border border-cyan-200/25 bg-slate-950/88 p-4 text-cyan-50 shadow-[0_26px_60px_rgba(2,6,23,0.78),0_0_0_1px_rgba(103,232,249,0.15)] backdrop-blur-2xl"
                   onClick={(event) => event.stopPropagation()}
                 >
                   <button

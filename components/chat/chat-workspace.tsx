@@ -168,6 +168,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   const [hydrated, setHydrated] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const mobileSidebarWidth = "min(88vw, 320px)";
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -413,8 +414,11 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   };
 
   return (
-    <div className="relative z-10 h-screen overflow-hidden px-3 py-3 md:px-4 md:py-4">
-      <div className="mx-auto flex h-full w-full max-w-[1500px] gap-3 md:gap-4">
+    <div
+      className="relative z-10 h-dvh overflow-hidden px-2 py-2 sm:px-3 sm:py-3 md:px-4 md:py-4"
+      style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+    >
+      <div className="mx-auto flex h-full w-full max-w-[1500px] gap-2 sm:gap-3 md:gap-4">
         <AnimatePresence initial={false}>
           {(isDesktop || mobileSidebarOpen) && (
             <motion.aside
@@ -422,12 +426,12 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
               animate={
                 isDesktop
                   ? { width: sidebarCollapsed ? 80 : 330, opacity: 1, x: 0 }
-                  : { width: 320, opacity: 1, x: 0 }
+                  : { width: mobileSidebarWidth, opacity: 1, x: 0 }
               }
               exit={{ x: -24, opacity: 0 }}
               transition={{ duration: 0.24, ease: "easeOut" }}
               className={`${
-                isDesktop ? "relative" : "absolute inset-y-0 left-0 z-40"
+                isDesktop ? "relative" : "absolute inset-y-0 left-0 z-40 w-[min(88vw,320px)]"
               } flex h-full shrink-0 flex-col overflow-hidden rounded-3xl border border-cyan-200/15 bg-slate-950/72 p-3 shadow-[0_24px_55px_rgba(2,6,23,0.55),0_0_0_1px_rgba(103,232,249,0.1)] backdrop-blur-2xl`}
             >
               <div
@@ -556,7 +560,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
         ) : null}
 
         <section className="relative flex min-w-0 flex-1 flex-col rounded-3xl border border-cyan-200/15 bg-slate-950/62 shadow-[0_24px_55px_rgba(2,6,23,0.48),0_0_0_1px_rgba(103,232,249,0.08)] backdrop-blur-2xl">
-          <header className="flex items-center gap-3 border-b border-cyan-100/10 px-3 py-3 md:px-5">
+          <header className="flex flex-wrap items-center gap-2 border-b border-cyan-100/10 px-3 py-3 md:gap-3 md:px-5">
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
@@ -585,7 +589,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-auto mt-16 max-w-xl rounded-3xl border border-cyan-200/18 bg-slate-900/46 p-6 text-center shadow-[0_16px_45px_rgba(2,6,23,0.42)]"
+                className="mx-auto mt-8 max-w-xl rounded-3xl border border-cyan-200/18 bg-slate-900/46 p-6 text-center shadow-[0_16px_45px_rgba(2,6,23,0.42)] sm:mt-12 md:mt-16"
               >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-200/30 bg-cyan-300/10 text-cyan-100 shadow-[0_0_22px_rgba(34,211,238,0.26)]">
                   <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">

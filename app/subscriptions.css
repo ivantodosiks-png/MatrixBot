@@ -470,3 +470,46 @@ body.contact-page {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 640px) {
+  .pricing-shell,
+  .account-shell,
+  .settings-shell,
+  .checkout-shell,
+  .contact-shell {
+    width: min(1160px, calc(100vw - 16px));
+    padding: 14px 0 28px;
+  }
+
+  .pricing-hero,
+  .pricing-card,
+  .account-panel,
+  .settings-panel,
+  .checkout-panel,
+  .contact-panel {
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .pricing-card-head h2 {
+    font-size: 1.35rem;
+  }
+
+  .pricing-card-head p {
+    font-size: 1.05rem;
+  }
+
+  .pricing-badge {
+    top: 10px;
+    right: 10px;
+    font-size: 0.66rem;
+    padding: 4px 7px;
+  }
+
+  .checkout-top,
+  .contact-top,
+  .account-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
