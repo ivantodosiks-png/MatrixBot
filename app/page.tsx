@@ -106,7 +106,7 @@ export default async function HomePage() {
             <p className="lp-eyebrow">NEON INTELLIGENCE PLATFORM</p>
             {isLoggedIn ? (
               <p className="mb-3 text-sm text-cyan-100/85">
-                Привет, рады снова тебя видеть, {userDisplayName}.
+                Welcome back, {userDisplayName}.
               </p>
             ) : null}
             <h1>AI coding bot that helps you build, debug, and ship faster.</h1>
@@ -425,4 +425,5 @@ export default async function HomePage() {
     </>
   );
 }
+
 
