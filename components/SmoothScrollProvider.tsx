@@ -39,6 +39,9 @@ export default function SmoothScrollProvider({
       touchMultiplier,
       smoothWheel,
       syncTouch: smoothTouch,
+      allowNestedScroll: true,
+      prevent: (node) =>
+        node instanceof Element && Boolean(node.closest(".chat-scroll-area")),
       autoRaf: false,
     };
     const lenis = new Lenis(options);

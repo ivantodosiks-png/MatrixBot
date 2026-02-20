@@ -26,10 +26,14 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     const root = document.documentElement;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
     const anyFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
+    const anyCoarsePointer = window.matchMedia("(any-pointer: coarse)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const updateEnabled = () => {
-      const next = (finePointer.matches || anyFinePointer.matches) && !reducedMotion.matches;
+      const hasFine = finePointer.matches || anyFinePointer.matches;
+      const coarseOnly = anyCoarsePointer.matches && !hasFine;
+      const likelyDesktop = window.innerWidth >= 1024;
+      const next = !reducedMotion.matches && !coarseOnly && (hasFine || likelyDesktop);
       setEnabled(next);
       root.classList.toggle("cursor-ring-enabled", next);
       if (!next) {
@@ -40,12 +44,16 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     updateEnabled();
     finePointer.addEventListener("change", updateEnabled);
     anyFinePointer.addEventListener("change", updateEnabled);
+    anyCoarsePointer.addEventListener("change", updateEnabled);
     reducedMotion.addEventListener("change", updateEnabled);
+    window.addEventListener("resize", updateEnabled, { passive: true });
 
     return () => {
       finePointer.removeEventListener("change", updateEnabled);
       anyFinePointer.removeEventListener("change", updateEnabled);
+      anyCoarsePointer.removeEventListener("change", updateEnabled);
       reducedMotion.removeEventListener("change", updateEnabled);
+      window.removeEventListener("resize", updateEnabled);
       root.classList.remove("cursor-ring-enabled", "cursor-ring-clicking");
     };
   }, []);
