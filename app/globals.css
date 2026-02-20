@@ -82,9 +82,9 @@ html.app-mounted body .lp-footer {
     0 0 30px rgba(90, 199, 255, 0.5),
     inset 0 0 18px rgba(113, 237, 255, 0.2);
   transition:
-    opacity 120ms ease,
-    border-color 220ms ease,
-    box-shadow 220ms ease;
+    opacity 80ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
   transform: translate3d(-9999px, -9999px, 0);
   will-change: transform, opacity, box-shadow;
   mix-blend-mode: screen;

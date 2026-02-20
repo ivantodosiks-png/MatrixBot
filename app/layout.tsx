@@ -23,7 +23,7 @@ export default function RootLayout({
           smoothWheel
           smoothTouch
         >
-          <CursorRing lerp={0.11} size={42} />
+          <CursorRing lerp={0.22} size={42} />
           <div className="ambient-layer ambient-particles" aria-hidden="true" />
           <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
           <div className="ambient-layer ambient-rain" aria-hidden="true" />
