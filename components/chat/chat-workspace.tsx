@@ -104,6 +104,16 @@ function formatHistoryTime(epochMs: number) {
   }).format(date);
 }
 
+function initialsFromName(name: string) {
+  const parts = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!parts.length) return "U";
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
 function sanitizeConversations(input: unknown): Conversation[] {
   if (!Array.isArray(input)) return [];
   return input
@@ -161,6 +171,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
     [activeConversationId, conversations]
   );
+  const userInitials = useMemo(() => initialsFromName(userName || userEmail), [userEmail, userName]);
 
   const ensureConversation = useCallback(() => {
     const conversation: Conversation = {
@@ -243,6 +254,29 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
     if (!isDesktop) {
       setMobileSidebarOpen(false);
     }
+  };
+
+  const handleDeleteConversation = (id: string) => {
+    setConversations((prev) => {
+      const remaining = prev.filter((conversation) => conversation.id !== id);
+
+      if (!remaining.length) {
+        const nextConversation: Conversation = {
+          id: createId(),
+          title: "New chat",
+          messages: [],
+          updatedAt: Date.now(),
+        };
+        setActiveConversationId(nextConversation.id);
+        return [nextConversation];
+      }
+
+      const sorted = [...remaining].sort((a, b) => b.updatedAt - a.updatedAt);
+      if (!sorted.some((conversation) => conversation.id === activeConversationId)) {
+        setActiveConversationId(sorted[0].id);
+      }
+      return sorted;
+    });
   };
 
   const updateConversation = (id: string, updater: (conversation: Conversation) => Conversation) => {
@@ -363,25 +397,31 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
               initial={isDesktop ? false : { x: -24, opacity: 0 }}
               animate={
                 isDesktop
-                  ? { width: sidebarCollapsed ? 86 : 330, opacity: 1, x: 0 }
+                  ? { width: sidebarCollapsed ? 80 : 330, opacity: 1, x: 0 }
                   : { width: 320, opacity: 1, x: 0 }
               }
               exit={{ x: -24, opacity: 0 }}
               transition={{ duration: 0.24, ease: "easeOut" }}
               className={`${
                 isDesktop ? "relative" : "absolute inset-y-0 left-0 z-40"
-              } flex h-full flex-col rounded-3xl border border-cyan-200/15 bg-slate-950/72 p-3 shadow-[0_24px_55px_rgba(2,6,23,0.55),0_0_0_1px_rgba(103,232,249,0.1)] backdrop-blur-2xl`}
+              } flex h-full shrink-0 flex-col overflow-hidden rounded-3xl border border-cyan-200/15 bg-slate-950/72 p-3 shadow-[0_24px_55px_rgba(2,6,23,0.55),0_0_0_1px_rgba(103,232,249,0.1)] backdrop-blur-2xl`}
             >
-              <div className="mb-3 flex items-center justify-between gap-2 border-b border-cyan-100/10 pb-3">
-                <div className="min-w-0">
-                  <p className="truncate text-[11px] uppercase tracking-[0.22em] text-cyan-100/55">
-                    Matrix Console
-                  </p>
-                  {!sidebarCollapsed ? (
+              <div
+                className={`mb-3 border-b border-cyan-100/10 pb-3 ${
+                  sidebarCollapsed && isDesktop
+                    ? "flex flex-col items-center gap-2"
+                    : "flex items-center justify-between gap-2"
+                }`}
+              >
+                {sidebarCollapsed && isDesktop ? null : (
+                  <div className="min-w-0">
+                    <p className="truncate text-[11px] uppercase tracking-[0.22em] text-cyan-100/55">
+                      Matrix Console
+                    </p>
                     <h2 className="truncate text-sm font-semibold text-cyan-50">Chat history</h2>
-                  ) : null}
-                </div>
-                <div className="flex items-center gap-2">
+                  </div>
+                )}
+                <div className={`flex gap-2 ${sidebarCollapsed && isDesktop ? "flex-col" : "items-center"}`}>
                   <button
                     type="button"
                     onClick={handleCreateConversation}
@@ -422,25 +462,59 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                 {conversations.map((conversation) => {
                   const active = conversation.id === activeConversationId;
                   return (
-                    <button
+                    <div
                       key={conversation.id}
-                      type="button"
-                      onClick={() => handleSelectConversation(conversation.id)}
-                      className={`w-full rounded-2xl border px-3 py-2.5 text-left transition ${
+                      className={`group w-full rounded-2xl border transition ${
                         active
                           ? "border-cyan-200/40 bg-cyan-300/10 shadow-[0_0_0_1px_rgba(103,232,249,0.18)]"
                           : "border-cyan-100/10 bg-slate-900/45 hover:border-cyan-200/30 hover:bg-slate-900/70"
+                      } ${
+                        sidebarCollapsed
+                          ? "flex flex-col items-center gap-1.5 px-2 py-2"
+                          : "flex items-center gap-2 px-2 py-2"
                       }`}
                     >
-                      <p className={`${sidebarCollapsed ? "sr-only" : "truncate text-sm font-medium text-cyan-50"}`}>
-                        {conversation.title}
-                      </p>
-                      {!sidebarCollapsed ? (
-                        <p className="mt-1 text-[11px] text-cyan-100/55">
-                          {formatHistoryTime(conversation.updatedAt)}
-                        </p>
-                      ) : null}
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectConversation(conversation.id)}
+                        className={`${
+                          sidebarCollapsed
+                            ? "flex h-8 w-8 items-center justify-center rounded-lg border border-cyan-200/25 bg-slate-900/80 text-[11px] font-semibold text-cyan-100"
+                            : "min-w-0 flex-1 rounded-xl px-1 py-0.5 text-left"
+                        }`}
+                        aria-label={`Open chat ${conversation.title}`}
+                      >
+                        {sidebarCollapsed ? (
+                          conversation.title.slice(0, 1).toUpperCase()
+                        ) : (
+                          <>
+                            <p className="truncate text-sm font-medium text-cyan-50">{conversation.title}</p>
+                            <p className="mt-1 text-[11px] text-cyan-100/55">
+                              {formatHistoryTime(conversation.updatedAt)}
+                            </p>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteConversation(conversation.id)}
+                        className={`inline-flex items-center justify-center rounded-lg border border-cyan-200/20 bg-slate-950/55 text-cyan-100/70 transition hover:border-rose-300/45 hover:bg-rose-500/15 hover:text-rose-100 ${
+                          sidebarCollapsed ? "h-7 w-7" : "h-8 w-8 shrink-0"
+                        }`}
+                        aria-label={`Delete chat ${conversation.title}`}
+                        title="Delete chat"
+                      >
+                        <svg viewBox="0 0 20 20" fill="none" className="h-3.5 w-3.5">
+                          <path
+                            d="M6 6L14 14M14 6L6 14"
+                            stroke="currentColor"
+                            strokeWidth="1.7"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -524,7 +598,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                       >
                         <div className={`flex max-w-[min(92%,760px)] items-end gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-200/35 bg-slate-900/70 text-[11px] font-semibold text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,0.2)]">
-                            {isUser ? "YOU" : "AI"}
+                            {isUser ? userInitials : "M"}
                           </div>
                           <div
                             className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${
@@ -553,9 +627,10 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                       className="flex items-center gap-3"
                     >
                       <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-200/35 bg-slate-900/70 text-[11px] font-semibold text-cyan-100">
-                        AI
+                        M
                       </div>
-                      <div className="inline-flex items-center gap-1 rounded-2xl border border-cyan-100/18 bg-slate-900/62 px-4 py-3">
+                      <div className="inline-flex items-center gap-2 rounded-2xl border border-cyan-100/18 bg-slate-900/62 px-4 py-3">
+                        <span className="text-xs text-cyan-100/72">Matrix skriver...</span>
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80 [animation-delay:-0.18s]" />
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80 [animation-delay:-0.06s]" />
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80" />

@@ -9,6 +9,7 @@
 
 body.pricing-page,
 body.account-page,
+body.settings-page,
 body.checkout-page,
 body.contact-page {
   min-height: 100vh;
@@ -16,6 +17,7 @@ body.contact-page {
 
 .pricing-shell,
 .account-shell,
+.settings-shell,
 .checkout-shell,
 .contact-shell {
   position: relative;
@@ -34,7 +36,8 @@ body.contact-page {
 }
 
 .pricing-hero,
-.account-panel {
+.account-panel,
+.settings-panel {
   border: 1px solid rgba(124, 197, 255, 0.32);
   border-radius: 18px;
   background: linear-gradient(155deg, rgba(21, 39, 62, 0.84), rgba(16, 29, 49, 0.82));
@@ -163,6 +166,12 @@ body.contact-page {
   min-height: 100vh;
 }
 
+.settings-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
 .checkout-shell {
   display: grid;
   place-items: center;
@@ -177,6 +186,11 @@ body.contact-page {
 
 .account-panel {
   width: min(860px, 100%);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.settings-panel {
+  width: min(940px, 100%);
   padding: clamp(20px, 3vw, 30px);
 }
 
@@ -396,6 +410,40 @@ body.contact-page {
   gap: 10px;
 }
 
+.settings-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settings-grid > div {
+  border: 1px solid rgba(126, 203, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(25, 45, 70, 0.66);
+  padding: 12px;
+}
+
+.settings-grid h2 {
+  margin: 0 0 8px;
+  font-size: 0.94rem;
+  color: #edf8ff;
+}
+
+.settings-grid ul {
+  margin: 0;
+  padding-left: 16px;
+  color: #cde4fb;
+  display: grid;
+  gap: 6px;
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 @media (max-width: 940px) {
   .pricing-grid {
     grid-template-columns: 1fr;
@@ -411,6 +459,10 @@ body.contact-page {
   }
 
   .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-grid {
     grid-template-columns: 1fr;
   }
 

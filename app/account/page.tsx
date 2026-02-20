@@ -54,9 +54,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         <section className="account-panel reveal-on-scroll">
           <div className="account-top">
             <h1>Account</h1>
-            <a className="lp-btn lp-btn-secondary" href="/pricing">
-              Subscriptions
-            </a>
+            <div className="settings-actions">
+              <a className="lp-btn lp-btn-secondary" href="/settings">
+                Settings
+              </a>
+              <a className="lp-btn lp-btn-secondary" href="/pricing">
+                Subscriptions
+              </a>
+            </div>
           </div>
 
           {checkoutSuccess ? (

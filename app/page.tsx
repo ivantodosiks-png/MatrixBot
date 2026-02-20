@@ -1,9 +1,13 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 import Script from "next/script";
+import { getServerSession } from "next-auth";
 import BodyClass from "@/components/body-class";
 import { getPublicStats } from "@/lib/stats";
+import { authOptions } from "@/lib/auth";
 
 export default async function HomePage() {
+  const session = await getServerSession(authOptions);
+  const isLoggedIn = Boolean(session?.user?.id);
   const stats = await getPublicStats(120).catch(() => ({
     usersCount: 0,
     successfulChatsCount: 0,
@@ -84,10 +88,18 @@ export default async function HomePage() {
             <a href="/pricing">Subscriptions</a>
           </nav>
           <div className="lp-header-cta">
-            <span className="lp-online-pill">Core online</span>
-            <a href="/login" className="lp-btn lp-btn-secondary">
-              Logg inn
-            </a>
+            <span className="lp-online-pill">
+              {isLoggedIn ? "Matrix skriver..." : "Core online"}
+            </span>
+            {isLoggedIn ? (
+              <a href="/account" className="lp-btn lp-btn-secondary">
+                Account
+              </a>
+            ) : (
+              <a href="/login" className="lp-btn lp-btn-secondary">
+                Logg inn
+              </a>
+            )}
             <a href="/chat" className="lp-btn lp-btn-primary">
               Open chat
             </a>
