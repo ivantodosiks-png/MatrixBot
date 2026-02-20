@@ -13,7 +13,6 @@ type ApiError = {
   error?: {
     message?: string;
   };
-  url?: string;
 };
 
 export default function PricingPlanAction(props: PricingPlanActionProps) {
@@ -50,17 +49,7 @@ export default function PricingPlanAction(props: PricingPlanActionProps) {
         return;
       }
 
-      const response = await fetch("/api/lemon/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      const data = (await response.json().catch(() => ({}))) as ApiError;
-      if (!response.ok || !data.url) {
-        throw new Error(data.error?.message || `HTTP ${response.status}`);
-      }
-
-      window.location.href = data.url;
+      window.location.href = `/checkout?plan=${plan}`;
     } catch (requestError) {
       const message =
         requestError instanceof Error ? requestError.message : "Request failed";
@@ -83,7 +72,7 @@ export default function PricingPlanAction(props: PricingPlanActionProps) {
         disabled={pending || isCurrentPlan}
         onClick={onClick}
       >
-        {pending ? "Redirecting..." : buttonLabel}
+        {pending ? "Processing..." : buttonLabel}
       </button>
       {error ? <p className="pricing-action-error">{error}</p> : null}
     </div>

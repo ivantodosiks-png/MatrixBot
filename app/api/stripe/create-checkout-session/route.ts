@@ -1,4 +1,10 @@
-import { POST as lemonPost } from "@/app/api/lemon/create-checkout-session/route";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const POST = lemonPost;
+
+export async function POST() {
+  return NextResponse.json(
+    { error: { message: "Legacy checkout route is disabled" } },
+    { status: 410 }
+  );
+}

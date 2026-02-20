@@ -1,4 +1,10 @@
-import { POST as lemonPost } from "@/app/api/lemon/webhook/route";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
-export const POST = lemonPost;
+
+export async function POST() {
+  return NextResponse.json(
+    { error: { message: "Legacy webhook route is disabled" } },
+    { status: 410 }
+  );
+}

@@ -464,6 +464,47 @@ export async function applyFreePlanForUser(userId: string) {
   });
 }
 
+export async function applyPaidPlanForUser(userId: string, plan: "PRO" | "ULTRA") {
+  if (!userId) return;
+
+  await withSchema(async () => {
+    const now = new Date();
+    const periodEnd = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+        0
+      )
+    );
+
+    await dbQuery(
+      `
+      UPDATE public.users
+      SET
+        plan = $2,
+        subscription_status = 'ACTIVE',
+        current_period_end = $3,
+        daily_message_count = 0,
+        monthly_message_count = 0,
+        daily_reset_at = $4,
+        month_reset_at = $5
+      WHERE id = $1
+      `,
+      [
+        userId,
+        plan,
+        periodEnd.toISOString(),
+        nextUtcDayBoundary(now).toISOString(),
+        nextUtcMonthBoundary(now).toISOString(),
+      ]
+    );
+  });
+}
+
 export async function updateUserSubscriptionByStripeCustomer(
   stripeCustomerId: string,
   update: StripeSubscriptionUpdate

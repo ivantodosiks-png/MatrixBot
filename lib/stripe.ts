@@ -1,19 +1,18 @@
-import type { UserSubscriptionStatus } from "@/lib/user-store";
-import {
-  createLemonCheckoutUrl,
-  createLemonCustomerPortalUrl,
-  extractLemonVariantId,
-  getAppUrl,
-  getLemonWebhookSecret,
-  lemonPeriodEndToDate,
-  normalizeLemonSubscriptionStatus,
-  retrieveLemonSubscription,
-  verifyLemonWebhookSignature,
-  type LemonSubscription,
-  type LemonWebhookEvent,
-} from "@/lib/lemon";
+﻿import type { UserSubscriptionStatus } from "@/lib/user-store";
 
-export type StripeSubscription = LemonSubscription;
+export type StripeSubscription = {
+  id: string;
+  customer?: string | null;
+  status?: string | null;
+  current_period_end?: number | null;
+  items?: {
+    data?: Array<{
+      price?: {
+        id?: string | null;
+      } | null;
+    }>;
+  } | null;
+};
 
 export type StripeCheckoutSession = {
   id: string;
@@ -27,66 +26,65 @@ export type StripeInvoice = {
   subscription?: string | null;
 };
 
-export type StripeWebhookEvent = LemonWebhookEvent;
+export type StripeWebhookEvent = {
+  id: string;
+  type: string;
+  data?: {
+    object?: unknown;
+  };
+};
 
-export { getAppUrl, getLemonWebhookSecret as getStripeWebhookSecret };
-
-export async function createStripeCustomer(params: {
-  email: string;
-  name?: string | null;
-  userId: string;
-}) {
-  void params;
-  throw new Error("Stripe is disabled. Use Lemon Squeezy checkout flow.");
+function disabled(): never {
+  throw new Error("Legacy Stripe integration is disabled");
 }
 
-export async function createStripeCheckoutSession(params: {
-  customerId: string;
-  priceId: string;
-  successUrl: string;
-  cancelUrl: string;
-}) {
-  return createLemonCheckoutUrl({
-    variantId: params.priceId,
-    email: "no-email@example.com",
-    name: null,
-    userId: params.customerId,
-    successUrl: params.successUrl,
-    cancelUrl: params.cancelUrl,
-  });
+export function getStripeWebhookSecret() {
+  return disabled();
 }
 
-export async function createStripePortalSession(params: {
-  customerId: string;
-  returnUrl: string;
-}) {
-  void params.returnUrl;
-  return createLemonCustomerPortalUrl(params.customerId);
+export function getAppUrl() {
+  const raw = String(process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "").trim();
+  if (!raw) {
+    throw new Error("Missing NEXT_PUBLIC_APP_URL (or APP_URL)");
+  }
+
+  if (!/^https?:\/\//.test(raw)) {
+    throw new Error("Invalid NEXT_PUBLIC_APP_URL: expected http:// or https://");
+  }
+
+  return raw.replace(/\/+$/, "");
 }
 
-export async function retrieveStripeSubscription(subscriptionId: string) {
-  return retrieveLemonSubscription(subscriptionId);
+export async function createStripeCustomer() {
+  return disabled();
+}
+
+export async function createStripeCheckoutSession() {
+  return disabled();
+}
+
+export async function createStripePortalSession() {
+  return disabled();
+}
+
+export async function retrieveStripeSubscription() {
+  return disabled();
 }
 
 export function getSubscriptionPriceId(subscription: StripeSubscription | null | undefined) {
-  return extractLemonVariantId(subscription);
+  return subscription?.items?.data?.[0]?.price?.id ?? null;
 }
 
 export function normalizeStripeSubscriptionStatus(status: string | null | undefined): UserSubscriptionStatus {
-  return normalizeLemonSubscriptionStatus(status);
+  if (!status) return "NONE";
+  return "NONE";
 }
 
-export function verifyStripeWebhookSignature(params: {
-  rawBody: string;
-  signatureHeader: string | null;
-  webhookSecret: string;
-}) {
-  return verifyLemonWebhookSignature(params);
+export function verifyStripeWebhookSignature() {
+  return false;
 }
 
 export function unixSecondsToDate(seconds: number | null | undefined) {
   if (!seconds || !Number.isFinite(seconds)) return null;
   return new Date(seconds * 1000);
 }
-
-export { lemonPeriodEndToDate };

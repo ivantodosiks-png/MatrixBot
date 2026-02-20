@@ -2,7 +2,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import SignOutButton from "@/components/sign-out-button";
-import ManageSubscriptionButton from "@/components/manage-subscription-button";
 import BodyClass from "@/components/body-class";
 import { findUserById } from "@/lib/user-store";
 
@@ -62,7 +61,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
           {checkoutSuccess ? (
             <p className="account-banner success">
-              Payment completed. Subscription status will sync in a few seconds.
+              Payment completed. Thank you for your purchase.
             </p>
           ) : null}
 
@@ -106,7 +105,6 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
           </dl>
 
           <div className="account-actions">
-            {user.stripe_subscription_id ? <ManageSubscriptionButton /> : null}
             <SignOutButton />
             <a className="lp-btn lp-btn-primary" href="/chat">
               Go to chat

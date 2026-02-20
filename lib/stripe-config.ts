@@ -1,42 +1,43 @@
-import {
-  getAppUrl,
-  getLemonVariantIdForPlan,
-  getLemonVariantMap,
-  getLemonWebhookSecret,
-} from "@/lib/lemon-config";
+﻿export type StripePlan = "pro" | "ultra";
 
-export type StripePlan = "pro" | "ultra";
-
-function readLegacyStripeSecretKey() {
-  const value = String(process.env.STRIPE_SECRET_KEY ?? "").trim();
-  if (!value) {
-    throw new Error("Stripe is disabled. Use Lemon Squeezy env variables.");
-  }
-  return value;
+function disabled(): never {
+  throw new Error("Legacy Stripe integration is disabled");
 }
 
 export function getStripeSecretKey() {
-  return readLegacyStripeSecretKey();
+  return disabled();
 }
 
 export function getStripeWebhookSecret() {
-  return getLemonWebhookSecret();
+  return disabled();
 }
 
 export function getStripePricePro() {
-  return getLemonVariantMap().pro;
+  return disabled();
 }
 
 export function getStripePriceUltra() {
-  return getLemonVariantMap().ultra;
+  return disabled();
 }
 
 export function getStripePriceIdForPlan(plan: StripePlan) {
-  return getLemonVariantIdForPlan(plan);
+  void plan;
+  return disabled();
 }
 
 export function getStripePriceMap() {
-  return getLemonVariantMap();
+  return { pro: disabled(), ultra: disabled() };
 }
 
-export { getAppUrl };
+export function getAppUrl() {
+  const raw = String(process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "").trim();
+  if (!raw) {
+    throw new Error("Missing NEXT_PUBLIC_APP_URL (or APP_URL)");
+  }
+
+  if (!/^https?:\/\//.test(raw)) {
+    throw new Error("Invalid NEXT_PUBLIC_APP_URL: expected http:// or https://");
+  }
+
+  return raw.replace(/\/+$/, "");
+}

@@ -8,12 +8,14 @@
 }
 
 body.pricing-page,
-body.account-page {
+body.account-page,
+body.checkout-page {
   min-height: 100vh;
 }
 
 .pricing-shell,
-.account-shell {
+.account-shell,
+.checkout-shell {
   position: relative;
   z-index: 1;
   width: min(1160px, 94vw);
@@ -159,9 +161,104 @@ body.account-page {
   min-height: 100vh;
 }
 
+.checkout-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+}
+
 .account-panel {
   width: min(860px, 100%);
   padding: clamp(20px, 3vw, 30px);
+}
+
+.checkout-panel {
+  width: min(720px, 100%);
+  border: 1px solid rgba(124, 197, 255, 0.32);
+  border-radius: 18px;
+  background: linear-gradient(155deg, rgba(21, 39, 62, 0.84), rgba(16, 29, 49, 0.82));
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.26);
+  backdrop-filter: blur(8px);
+  padding: clamp(20px, 3vw, 30px);
+}
+
+.checkout-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.checkout-top h1 {
+  margin: 0;
+}
+
+.checkout-subtitle {
+  margin: 12px 0 0;
+  color: #c2d9f4;
+}
+
+.checkout-form {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.checkout-summary {
+  border: 1px solid rgba(126, 203, 255, 0.3);
+  border-radius: 12px;
+  background: rgba(25, 45, 70, 0.66);
+  padding: 12px;
+}
+
+.checkout-summary p {
+  margin: 0;
+  color: #d6e9ff;
+}
+
+.checkout-summary p + p {
+  margin-top: 8px;
+}
+
+.checkout-label {
+  display: grid;
+  gap: 7px;
+  color: #d5e9ff;
+  font-size: 0.9rem;
+}
+
+.checkout-input {
+  border: 1px solid rgba(126, 203, 255, 0.34);
+  border-radius: 10px;
+  background: rgba(14, 24, 40, 0.65);
+  color: #f2fbff;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.checkout-input:focus {
+  border-color: rgba(126, 203, 255, 0.74);
+  box-shadow: 0 0 0 2px rgba(126, 203, 255, 0.18);
+}
+
+.checkout-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.checkout-error,
+.checkout-success {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.checkout-error {
+  color: #ffc6c6;
+}
+
+.checkout-success {
+  color: #d2ffe9;
 }
 
 .account-top {
@@ -224,6 +321,10 @@ body.account-page {
   }
 
   .account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-row {
     grid-template-columns: 1fr;
   }
 }

@@ -1,5 +1,4 @@
 import type { UserPlan } from "@/lib/user-store";
-import { getLemonVariantMap } from "@/lib/lemon-config";
 
 export type PublicPlan = "free" | "pro" | "ultra";
 
@@ -40,15 +39,4 @@ export function userPlanToPublicPlan(plan: UserPlan): PublicPlan {
   if (plan === "PRO") return "pro";
   if (plan === "ULTRA") return "ultra";
   return "free";
-}
-
-export function resolvePlanByVariantId(variantId: string | null | undefined) {
-  if (!variantId) return "FREE" satisfies UserPlan;
-
-  const variants = getLemonVariantMap();
-
-  if (variantId === variants.pro) return "PRO" satisfies UserPlan;
-  if (variantId === variants.ultra) return "ULTRA" satisfies UserPlan;
-
-  return "FREE" satisfies UserPlan;
 }
