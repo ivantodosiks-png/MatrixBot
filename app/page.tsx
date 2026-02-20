@@ -34,6 +34,7 @@ export default async function HomePage() {
             <a href="#how">How it works</a>
             <a href="#faq">FAQ</a>
             <a href="/pricing">Subscriptions</a>
+            <a href="/contact">Contact</a>
           </nav>
           <div className="lp-header-cta">
             <span className="lp-online-pill">Core online</span>
