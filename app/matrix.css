@@ -2617,6 +2617,19 @@ body.chat-page {
   overscroll-behavior: none;
 }
 
+.chat-page .chat-scroll-area,
+.chat-page .sidebar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+}
+
+.chat-page .chat-scroll-area::-webkit-scrollbar,
+.chat-page .sidebar::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
 .chat-page .app,
 .chat-page .main,
 .chat-page .messages,

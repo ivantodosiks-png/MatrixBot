@@ -35,6 +35,57 @@ type Conversation = {
 const STORAGE_KEY = "matrix_chat_conversations_v2";
 const ACTIVE_STORAGE_KEY = "matrix_chat_active_v2";
 
+function setupInertialWheelScroll(element: HTMLElement) {
+  if (typeof window === "undefined") return () => undefined;
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (prefersReduced) return () => undefined;
+
+  let target = element.scrollTop;
+  let frameId = 0;
+
+  const tick = () => {
+    const diff = target - element.scrollTop;
+    if (Math.abs(diff) < 0.45) {
+      element.scrollTop = target;
+      frameId = 0;
+      return;
+    }
+    element.scrollTop += diff * 0.18;
+    frameId = window.requestAnimationFrame(tick);
+  };
+
+  const onWheel = (event: WheelEvent) => {
+    const max = Math.max(0, element.scrollHeight - element.clientHeight);
+    if (max <= 0) return;
+
+    const next = Math.max(0, Math.min(max, target + event.deltaY));
+    if (next === target) return;
+
+    event.preventDefault();
+    target = next;
+    if (!frameId) {
+      frameId = window.requestAnimationFrame(tick);
+    }
+  };
+
+  const onScroll = () => {
+    if (!frameId) {
+      target = element.scrollTop;
+    }
+  };
+
+  element.addEventListener("wheel", onWheel, { passive: false });
+  element.addEventListener("scroll", onScroll, { passive: true });
+
+  return () => {
+    element.removeEventListener("wheel", onWheel);
+    element.removeEventListener("scroll", onScroll);
+    if (frameId) {
+      window.cancelAnimationFrame(frameId);
+    }
+  };
+}
+
 function createId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -165,6 +216,8 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   const [isDesktop, setIsDesktop] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const sidebarListRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -238,6 +291,21 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeConversation?.messages.length, isPending]);
+
+  useEffect(() => {
+    const cleanups: Array<() => void> = [];
+
+    if (sidebarListRef.current) {
+      cleanups.push(setupInertialWheelScroll(sidebarListRef.current));
+    }
+    if (messagesContainerRef.current) {
+      cleanups.push(setupInertialWheelScroll(messagesContainerRef.current));
+    }
+
+    return () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
+  }, [isDesktop, mobileSidebarOpen]);
 
   const handleSelectConversation = (id: string) => {
     setActiveConversationId(id);
@@ -457,7 +525,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                 </div>
               </div>
 
-              <div className="space-y-2 overflow-y-auto pr-1">
+              <div ref={sidebarListRef} className="chat-scroll-area space-y-2 overflow-y-auto pr-1">
                 {conversations.map((conversation) => {
                   const active = conversation.id === activeConversationId;
                   return (
@@ -553,7 +621,10 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
             <AccountMenu name={userName} email={userEmail} />
           </header>
 
-          <div className="relative min-h-0 flex-1 overflow-y-auto px-3 py-4 md:px-5 md:py-5">
+          <div
+            ref={messagesContainerRef}
+            className="chat-scroll-area relative min-h-0 flex-1 overflow-y-auto px-3 py-4 md:px-5 md:py-5"
+          >
             {!activeConversation || activeConversation.messages.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

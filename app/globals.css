@@ -66,3 +66,94 @@ html.app-mounted body .lp-footer {
     transform: translate3d(0, 0, 0);
   }
 }
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  border: 1px solid rgba(125, 224, 255, 0.7);
+  background: radial-gradient(circle at 50% 50%, rgba(110, 210, 255, 0.08), rgba(110, 210, 255, 0) 70%);
+  box-shadow:
+    0 0 0 1px rgba(106, 193, 255, 0.2),
+    0 0 22px rgba(78, 183, 255, 0.34),
+    inset 0 0 14px rgba(101, 230, 255, 0.12);
+  transition:
+    opacity 180ms ease,
+    border-color 220ms ease,
+    box-shadow 220ms ease;
+  transform: translate3d(-9999px, -9999px, 0);
+  will-change: transform, opacity, box-shadow;
+}
+
+.cursor-ring[data-visible="true"] {
+  opacity: 1;
+}
+
+.cursor-ring[data-hover="true"] {
+  border-color: rgba(143, 232, 255, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(125, 229, 255, 0.28),
+    0 0 26px rgba(92, 210, 255, 0.46),
+    inset 0 0 18px rgba(102, 233, 255, 0.18);
+}
+
+.cursor-ring[data-pressed="true"] {
+  border-color: rgba(175, 243, 255, 0.95);
+}
+
+.cursor-ring__particles {
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.28;
+  background:
+    radial-gradient(circle at 16% 22%, rgba(146, 237, 255, 0.44) 0 1px, transparent 2px),
+    radial-gradient(circle at 74% 18%, rgba(127, 221, 255, 0.4) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 70%, rgba(139, 233, 255, 0.32) 0 1px, transparent 2px),
+    radial-gradient(circle at 24% 82%, rgba(112, 218, 255, 0.34) 0 1px, transparent 2px);
+  filter: blur(0.25px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html.cursor-ring-enabled,
+  html.cursor-ring-enabled body,
+  html.cursor-ring-enabled * {
+    cursor: none !important;
+  }
+
+  html.cursor-ring-enabled .lp-btn,
+  html.cursor-ring-enabled button,
+  html.cursor-ring-enabled a[role="button"] {
+    transition:
+      transform 180ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease;
+    will-change: transform, box-shadow;
+  }
+
+  html.cursor-ring-enabled .lp-btn:hover,
+  html.cursor-ring-enabled button:hover,
+  html.cursor-ring-enabled a[role="button"]:hover {
+    transform: translate3d(0, -1px, 0) scale(1.02);
+    box-shadow:
+      0 0 0 1px rgba(126, 221, 255, 0.28),
+      0 0 22px rgba(84, 198, 255, 0.28);
+  }
+
+  html.cursor-ring-enabled.cursor-ring-clicking .lp-btn:hover,
+  html.cursor-ring-enabled.cursor-ring-clicking button:hover,
+  html.cursor-ring-enabled.cursor-ring-clicking a[role="button"]:hover {
+    transform: translate3d(0, 0, 0) scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-ring {
+    display: none !important;
+  }
+}
