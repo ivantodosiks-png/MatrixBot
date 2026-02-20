@@ -25,10 +25,11 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
 
     const root = document.documentElement;
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const anyFinePointer = window.matchMedia("(any-hover: hover) and (any-pointer: fine)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const updateEnabled = () => {
-      const next = finePointer.matches && !reducedMotion.matches;
+      const next = (finePointer.matches || anyFinePointer.matches) && !reducedMotion.matches;
       setEnabled(next);
       root.classList.toggle("cursor-ring-enabled", next);
       if (!next) {
@@ -38,10 +39,12 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
 
     updateEnabled();
     finePointer.addEventListener("change", updateEnabled);
+    anyFinePointer.addEventListener("change", updateEnabled);
     reducedMotion.addEventListener("change", updateEnabled);
 
     return () => {
       finePointer.removeEventListener("change", updateEnabled);
+      anyFinePointer.removeEventListener("change", updateEnabled);
       reducedMotion.removeEventListener("change", updateEnabled);
       root.classList.remove("cursor-ring-enabled", "cursor-ring-clicking");
     };
@@ -103,7 +106,7 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     };
 
     const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") return;
+      if (event.pointerType === "touch") return;
       target.x = event.clientX;
       target.y = event.clientY;
       setVisible(true);
@@ -111,12 +114,23 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     };
 
     const onPointerDown = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse") return;
+      if (event.pointerType === "touch") return;
+      setPressed(true);
+    };
+    const onMouseDown = () => {
       setPressed(true);
     };
 
     const onPointerUp = () => {
       setPressed(false);
+    };
+
+    const onMouseMove = (event: MouseEvent) => {
+      target.x = event.clientX;
+      target.y = event.clientY;
+      setVisible(true);
+      const hovered = document.elementFromPoint(event.clientX, event.clientY);
+      setHoveringInteractive(isInteractiveTarget(hovered));
     };
 
     const onPointerLeave = () => {
@@ -132,6 +146,9 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
     window.addEventListener("pointerup", onPointerUp, { passive: true });
     window.addEventListener("pointercancel", onPointerUp, { passive: true });
     window.addEventListener("pointerleave", onPointerLeave, { passive: true });
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("mousedown", onMouseDown, { passive: true });
+    window.addEventListener("mouseup", onPointerUp, { passive: true });
     window.addEventListener("blur", onPointerLeave);
 
     return () => {
@@ -141,6 +158,9 @@ export default function CursorRing({ lerp = 0.11, size = 34 }: CursorRingProps) 
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
       window.removeEventListener("pointerleave", onPointerLeave);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mousedown", onMouseDown);
+      window.removeEventListener("mouseup", onPointerUp);
       window.removeEventListener("blur", onPointerLeave);
       root.classList.remove("cursor-ring-clicking");
     };
