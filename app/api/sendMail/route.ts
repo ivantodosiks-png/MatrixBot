@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendSmtpEmail } from "@/lib/smtp-transport";
 
 export const runtime = "nodejs";
 
@@ -49,7 +50,6 @@ function getSmtpConfig() {
     user: readRequiredEnv("SMTP_USER"),
     pass: readRequiredEnv("SMTP_PASS"),
     from: readRequiredEnv("SMTP_FROM"),
-    secure: port === 465,
   };
 }
 
@@ -92,51 +92,6 @@ function normalizeText(input: unknown) {
 
 function sanitize(input: string) {
   return input.replace(/[<>]/g, "");
-}
-
-function isTlsVersionError(error: unknown) {
-  const message = error instanceof Error ? error.message.toLowerCase() : "";
-  return (
-    message.includes("wrong version number") ||
-    message.includes("ssl routines") ||
-    message.includes("tls") ||
-    message.includes("eproto")
-  );
-}
-
-async function sendWithTransport(
-  smtp: ReturnType<typeof getSmtpConfig>,
-  secure: boolean,
-  payload: Record<string, unknown>
-) {
-  const nodemailer = await loadNodemailer();
-  const transporter = nodemailer.default.createTransport({
-    host: smtp.host,
-    port: smtp.port,
-    secure,
-    requireTLS: !secure,
-    auth: {
-      user: smtp.user,
-      pass: smtp.pass,
-    },
-    tls: {
-      minVersion: "TLSv1.2",
-    },
-  });
-
-  await transporter.sendMail(payload);
-}
-
-async function loadNodemailer() {
-  const dynamicImport = new Function("m", "return import(m)") as (m: string) => Promise<{
-    default: {
-      createTransport: (options: Record<string, unknown>) => {
-        sendMail: (options: Record<string, unknown>) => Promise<unknown>;
-      };
-    };
-  }>;
-
-  return dynamicImport("nodemailer");
 }
 
 export async function POST(request: Request) {
@@ -207,24 +162,13 @@ export async function POST(request: Request) {
       <pre style="white-space:pre-wrap;font-family:inherit">${message}</pre>
     `;
 
-    const payload = {
-      from: smtp.from,
+    await sendSmtpEmail(smtp, {
       to: smtp.from,
       replyTo: email,
       subject: `Contact form: ${name}`,
       text,
       html,
-    };
-
-    try {
-      await sendWithTransport(smtp, smtp.secure, payload);
-    } catch (error) {
-      if (!isTlsVersionError(error)) {
-        throw error;
-      }
-
-      await sendWithTransport(smtp, !smtp.secure, payload);
-    }
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

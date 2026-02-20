@@ -1,4 +1,6 @@
-﻿type ReceiptEmailInput = {
+﻿import { sendSmtpEmail } from "@/lib/smtp-transport";
+
+type ReceiptEmailInput = {
   to: string;
   planName: string;
   amountLabel: string;
@@ -59,47 +61,6 @@ function escapeHtml(value: string) {
     .replaceAll('"', "&quot;");
 }
 
-function isTlsVersionError(error: unknown) {
-  const message = error instanceof Error ? error.message.toLowerCase() : "";
-  return (
-    message.includes("wrong version number") ||
-    message.includes("ssl routines") ||
-    message.includes("tls") ||
-    message.includes("eproto")
-  );
-}
-
-async function loadNodemailer() {
-  const dynamicImport = new Function("m", "return import(m)") as (m: string) => Promise<{
-    default: {
-      createTransport: (options: Record<string, unknown>) => {
-        sendMail: (options: Record<string, unknown>) => Promise<unknown>;
-      };
-    };
-  }>;
-
-  return dynamicImport("nodemailer");
-}
-
-async function sendWithTransport(config: SmtpConfig, secure: boolean, payload: Record<string, unknown>) {
-  const nodemailer = await loadNodemailer();
-  const transporter = nodemailer.default.createTransport({
-    host: config.host,
-    port: config.port,
-    secure,
-    requireTLS: !secure,
-    auth: {
-      user: config.user,
-      pass: config.pass,
-    },
-    tls: {
-      minVersion: "TLSv1.2",
-    },
-  });
-
-  await transporter.sendMail(payload);
-}
-
 export async function sendReceiptEmail(input: ReceiptEmailInput) {
   const config = readSmtpConfig();
   const purchasedAt = formatDate(input.purchasedAt);
@@ -126,23 +87,10 @@ export async function sendReceiptEmail(input: ReceiptEmailInput) {
     </ul>
   `.trim();
 
-  const payload = {
-    from: config.from,
+  await sendSmtpEmail(config, {
     to: input.to,
     subject: "Your Matrix GPT receipt",
     text: textBody,
     html: htmlBody,
-  };
-
-  const preferredSecure = config.port === 465;
-
-  try {
-    await sendWithTransport(config, preferredSecure, payload);
-  } catch (error) {
-    if (!isTlsVersionError(error)) {
-      throw error;
-    }
-
-    await sendWithTransport(config, !preferredSecure, payload);
-  }
+  });
 }
