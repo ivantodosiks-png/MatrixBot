@@ -53,6 +53,17 @@ function parseRecipients(to: string | string[]) {
     .filter(Boolean);
 }
 
+function extractEmailAddress(value: string) {
+  const input = value.trim();
+  const angle = input.match(/<([^<>]+)>/);
+  const candidate = (angle ? angle[1] : input).trim();
+  return candidate;
+}
+
+function isValidMailbox(value: string) {
+  return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(value);
+}
+
 class SmtpConnection {
   private socket: net.Socket | tls.TLSSocket | null = null;
   private buffer = "";
@@ -204,7 +215,7 @@ class SmtpConnection {
 }
 
 function buildMime(config: SmtpConfig, message: SmtpMessage) {
-  const recipients = parseRecipients(message.to);
+  const recipients = parseRecipients(message.to).map(extractEmailAddress);
   if (recipients.length === 0) {
     throw new Error("No recipient email provided");
   }
@@ -259,8 +270,16 @@ function buildMime(config: SmtpConfig, message: SmtpMessage) {
 
 async function sendInternal(config: SmtpConfig, message: SmtpMessage, useTlsFromStart: boolean) {
   const connection = new SmtpConnection();
-  const recipients = parseRecipients(message.to);
+  const recipients = parseRecipients(message.to).map(extractEmailAddress);
+  const envelopeFrom = extractEmailAddress(config.from);
   const mime = buildMime(config, message);
+
+  if (!isValidMailbox(envelopeFrom)) {
+    throw new Error("Invalid SMTP_FROM envelope address");
+  }
+  if (recipients.some((item) => !isValidMailbox(item))) {
+    throw new Error("Invalid recipient envelope address");
+  }
 
   try {
     if (useTlsFromStart) {
@@ -277,7 +296,7 @@ async function sendInternal(config: SmtpConfig, message: SmtpMessage, useTlsFrom
     await connection.command(toBase64(config.user), [334]);
     await connection.command(toBase64(config.pass), [235]);
 
-    await connection.command(`MAIL FROM:<${config.from}>`, [250]);
+    await connection.command(`MAIL FROM:<${envelopeFrom}>`, [250]);
     for (const recipient of recipients) {
       await connection.command(`RCPT TO:<${recipient}>`, [250, 251]);
     }
