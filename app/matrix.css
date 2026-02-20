@@ -46,6 +46,10 @@ body.landing .footer {
   margin-top: auto;
 }
 
+body.landing .lp-footer {
+  margin-top: auto;
+}
+
 a { color: var(--accent); text-decoration: none; }
 
 body.matrix::before {
@@ -94,6 +98,30 @@ body.matrix::after {
 
 body.matrix .ambient-layer {
   opacity: 1;
+}
+
+body.matrix .lp-header,
+body.matrix .lp-main,
+body.matrix .lp-footer,
+body.matrix .pricing-shell,
+body.matrix .checkout-shell,
+body.matrix .contact-shell,
+body.matrix .account-shell,
+body.matrix .settings-shell {
+  animation: page-enter-soft 520ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+body.matrix .lp-main,
+body.matrix .pricing-shell,
+body.matrix .checkout-shell,
+body.matrix .contact-shell,
+body.matrix .account-shell,
+body.matrix .settings-shell {
+  animation-delay: 70ms;
+}
+
+body.matrix .lp-footer {
+  animation-delay: 120ms;
 }
 
 .ambient-particles {
@@ -210,6 +238,17 @@ body.matrix .ambient-layer {
 @keyframes water-ripple {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(0, 14px, 0); }
+}
+
+@keyframes page-enter-soft {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .top {
@@ -2035,6 +2074,17 @@ body.auth-page {
   .lp-nav a::after,
   .lp-footer-links a::after {
     transition: none;
+    animation: none;
+  }
+
+  body.matrix .lp-header,
+  body.matrix .lp-main,
+  body.matrix .lp-footer,
+  body.matrix .pricing-shell,
+  body.matrix .checkout-shell,
+  body.matrix .contact-shell,
+  body.matrix .account-shell,
+  body.matrix .settings-shell {
     animation: none;
   }
 }

@@ -22,12 +22,10 @@ export default function RootLayout({
           smoothWheel
           smoothTouch
         >
-          <div className="site-transition">
-            <div className="ambient-layer ambient-particles" aria-hidden="true" />
-            <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
-            <div className="ambient-layer ambient-rain" aria-hidden="true" />
-            {children}
-          </div>
+          <div className="ambient-layer ambient-particles" aria-hidden="true" />
+          <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
+          <div className="ambient-layer ambient-rain" aria-hidden="true" />
+          {children}
         </SmoothScrollProvider>
       </body>
     </html>
