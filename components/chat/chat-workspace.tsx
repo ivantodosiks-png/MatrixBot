@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from "react";
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import AccountMenu from "@/components/chat/account-menu";
 
@@ -551,18 +550,6 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
               <p className="text-xs text-cyan-100/55">Model: gpt-5.2</p>
             </div>
 
-            <Link
-              href="/"
-              className="hidden rounded-xl border border-cyan-200/25 bg-slate-900/55 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/80 md:inline-flex"
-            >
-              Home
-            </Link>
-            <Link
-              href="/pricing"
-              className="hidden rounded-xl border border-cyan-200/25 bg-slate-900/55 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/80 md:inline-flex"
-            >
-              Subscriptions
-            </Link>
             <AccountMenu name={userName} email={userEmail} />
           </header>
 

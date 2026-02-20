@@ -401,9 +401,6 @@ export default async function HomePage() {
                 <strong>App Store</strong>
               </span>
             </a>
-            <a href="/chat" className="lp-btn lp-btn-primary">
-              Start
-            </a>
           </div>
         </section>
       </main>
