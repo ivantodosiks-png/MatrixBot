@@ -35,59 +35,7 @@ type Conversation = {
 const STORAGE_KEY = "matrix_chat_conversations_v2";
 const ACTIVE_STORAGE_KEY = "matrix_chat_active_v2";
 
-function setupInertialWheelScroll(element: HTMLElement) {
-  if (typeof window === "undefined") return () => undefined;
-  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (prefersReduced) return () => undefined;
-
-  let velocity = 0;
-  let frameId = 0;
-
-  const tick = () => {
-    if (Math.abs(velocity) < 0.1) {
-      velocity = 0;
-      frameId = 0;
-      return;
-    }
-    const max = Math.max(0, element.scrollHeight - element.clientHeight);
-    const next = Math.max(0, Math.min(max, element.scrollTop + velocity));
-    element.scrollTop = next;
-    velocity *= 0.82;
-
-    if (next <= 0 || next >= max) {
-      velocity *= 0.65;
-    }
-
-    frameId = window.requestAnimationFrame(tick);
-  };
-
-  const onWheel = (event: WheelEvent) => {
-    const max = Math.max(0, element.scrollHeight - element.clientHeight);
-    if (max <= 0) return;
-
-    const atTop = element.scrollTop <= 0;
-    const atBottom = element.scrollTop >= max - 0.5;
-    if ((atTop && event.deltaY < 0) || (atBottom && event.deltaY > 0)) {
-      return;
-    }
-
-    event.preventDefault();
-    velocity += event.deltaY * 0.6;
-    velocity = Math.max(-70, Math.min(70, velocity));
-    if (!frameId) {
-      frameId = window.requestAnimationFrame(tick);
-    }
-  };
-
-  element.addEventListener("wheel", onWheel, { passive: false });
-
-  return () => {
-    element.removeEventListener("wheel", onWheel);
-    if (frameId) {
-      window.cancelAnimationFrame(frameId);
-    }
-  };
-}
+const AVATAR_KEY_PREFIX = "matrix_avatar_v1_";
 
 function createId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -218,9 +166,8 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const sidebarListRef = useRef<HTMLDivElement | null>(null);
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -296,19 +243,26 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   }, [activeConversation?.messages.length, isPending]);
 
   useEffect(() => {
-    const cleanups: Array<() => void> = [];
-
-    if (sidebarListRef.current) {
-      cleanups.push(setupInertialWheelScroll(sidebarListRef.current));
+    const key = `${AVATAR_KEY_PREFIX}${userEmail.toLowerCase()}`;
+    try {
+      const value = window.localStorage.getItem(key) || "";
+      setAvatarUrl(value);
+    } catch {
+      setAvatarUrl("");
     }
-    if (messagesContainerRef.current) {
-      cleanups.push(setupInertialWheelScroll(messagesContainerRef.current));
-    }
 
-    return () => {
-      cleanups.forEach((cleanup) => cleanup());
+    const onAvatarUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ email?: string; url?: string }>;
+      if ((customEvent.detail?.email || "").toLowerCase() !== userEmail.toLowerCase()) {
+        return;
+      }
+      setAvatarUrl(customEvent.detail?.url || "");
     };
-  }, [isDesktop, mobileSidebarOpen]);
+
+    window.addEventListener("matrix-avatar-updated", onAvatarUpdate as EventListener);
+    return () =>
+      window.removeEventListener("matrix-avatar-updated", onAvatarUpdate as EventListener);
+  }, [userEmail]);
 
   const handleSelectConversation = (id: string) => {
     setActiveConversationId(id);
@@ -528,11 +482,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                 </div>
               </div>
 
-              <div
-                ref={sidebarListRef}
-                data-lenis-prevent
-                className="chat-scroll-area space-y-2 overflow-y-auto pr-1"
-              >
+              <div className="chat-scroll-area space-y-2 overflow-y-auto pr-1">
                 {conversations.map((conversation) => {
                   const active = conversation.id === activeConversationId;
                   return (
@@ -629,8 +579,6 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
           </header>
 
           <div
-            ref={messagesContainerRef}
-            data-lenis-prevent
             className="chat-scroll-area relative min-h-0 flex-1 overflow-y-auto px-3 py-4 md:px-5 md:py-5"
           >
             {!activeConversation || activeConversation.messages.length === 0 ? (
@@ -669,8 +617,16 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                         className={`flex w-full ${isUser ? "justify-end" : "justify-start"}`}
                       >
                         <div className={`flex max-w-[min(92%,760px)] items-end gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-cyan-200/35 bg-slate-900/70 text-[11px] font-semibold text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,0.2)]">
-                            {isUser ? userInitials : "M"}
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-cyan-200/35 bg-slate-900/70 text-[11px] font-semibold text-cyan-100 shadow-[0_0_16px_rgba(34,211,238,0.2)]">
+                            {isUser && avatarUrl ? (
+                              <img
+                                src={avatarUrl}
+                                alt={`${userName} avatar`}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <>{isUser ? userInitials : "M"}</>
+                            )}
                           </div>
                           <div
                             className={`rounded-2xl border px-4 py-3 text-sm leading-6 ${

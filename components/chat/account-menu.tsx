@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { signOut } from "next-auth/react";
@@ -12,6 +12,16 @@ type AccountMenuProps = {
 };
 
 type ModalType = "profile" | "settings" | null;
+const AVATAR_KEY_PREFIX = "matrix_avatar_v1_";
+
+function readStoredAvatar(email: string) {
+  if (typeof window === "undefined") return "";
+  try {
+    return window.localStorage.getItem(`${AVATAR_KEY_PREFIX}${email.toLowerCase()}`) || "";
+  } catch {
+    return "";
+  }
+}
 
 function initialsFromName(name: string) {
   const parts = name
@@ -26,6 +36,9 @@ function initialsFromName(name: string) {
 export default function AccountMenu({ name, email }: AccountMenuProps) {
   const initials = initialsFromName(name || email);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [avatarUrl, setAvatarUrl] = useState(() => readStoredAvatar(email));
+  const [avatarError, setAvatarError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!activeModal) return;
@@ -45,13 +58,73 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
     };
   }, [activeModal]);
 
+  const emitAvatarUpdate = (url: string) => {
+    const event = new CustomEvent("matrix-avatar-updated", {
+      detail: { email, url },
+    });
+    window.dispatchEvent(event);
+  };
+
+  const onAvatarFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setAvatarError("Please select an image file.");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      setAvatarError("Image is too large. Max size is 2MB.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      if (!result) {
+        setAvatarError("Failed to read image file.");
+        return;
+      }
+
+      try {
+        const key = `${AVATAR_KEY_PREFIX}${email.toLowerCase()}`;
+        window.localStorage.setItem(key, result);
+        setAvatarUrl(result);
+        setAvatarError("");
+        emitAvatarUpdate(result);
+      } catch {
+        setAvatarError("Failed to save avatar.");
+      }
+    };
+    reader.onerror = () => setAvatarError("Failed to read image file.");
+    reader.readAsDataURL(file);
+    event.target.value = "";
+  };
+
+  const removeAvatar = () => {
+    try {
+      const key = `${AVATAR_KEY_PREFIX}${email.toLowerCase()}`;
+      window.localStorage.removeItem(key);
+      setAvatarUrl("");
+      setAvatarError("");
+      emitAvatarUpdate("");
+    } catch {
+      setAvatarError("Failed to remove avatar.");
+    }
+  };
+
   return (
     <Menu as="div" className="relative">
       {({ open }) => (
         <>
           <MenuButton className="group flex items-center gap-3 rounded-2xl border border-cyan-300/25 bg-slate-900/70 px-2 py-2 text-left text-cyan-50 shadow-[0_0_0_1px_rgba(125,211,252,0.08),0_10px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl transition hover:border-cyan-200/45 hover:bg-slate-900/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/25 to-blue-400/20 font-semibold tracking-wide text-cyan-100 shadow-[0_0_18px_rgba(56,189,248,0.32)]">
-              {initials}
+            <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/25 to-blue-400/20 font-semibold tracking-wide text-cyan-100 shadow-[0_0_18px_rgba(56,189,248,0.32)]">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={`${name} avatar`} className="h-full w-full object-cover" />
+              ) : (
+                initials
+              )}
             </span>
             <span className="hidden min-w-0 md:flex md:flex-col">
               <span className="truncate text-sm font-semibold text-cyan-50">{name}</span>
@@ -79,8 +152,19 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                 className="z-40 mt-3 w-64 origin-top-right rounded-2xl border border-cyan-200/20 bg-slate-950/78 p-2 text-sm text-cyan-50 shadow-[0_20px_48px_rgba(2,6,23,0.7),0_0_0_1px_rgba(103,232,249,0.12)] backdrop-blur-2xl focus:outline-none"
               >
                 <div className="mb-2 rounded-xl border border-cyan-200/10 bg-slate-900/55 p-3">
-                  <p className="truncate text-sm font-semibold text-cyan-50">{name}</p>
-                  <p className="truncate text-xs text-cyan-100/65">{email}</p>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/25 to-blue-400/20 font-semibold tracking-wide text-cyan-100">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={`${name} avatar`} className="h-full w-full object-cover" />
+                      ) : (
+                        initials
+                      )}
+                    </span>
+                    <span className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-cyan-50">{name}</p>
+                      <p className="truncate text-xs text-cyan-100/65">{email}</p>
+                    </span>
+                  </div>
                 </div>
 
                 <MenuItem>
@@ -188,8 +272,47 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                       <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/60">Account</p>
                       <h3 className="mt-2 text-lg font-semibold text-cyan-50">Profile</h3>
                       <div className="mt-4 rounded-xl border border-cyan-200/15 bg-slate-900/55 p-3">
-                        <p className="truncate text-sm font-semibold text-cyan-50">{name}</p>
-                        <p className="truncate text-xs text-cyan-100/65">{email}</p>
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-cyan-300/35 bg-gradient-to-br from-cyan-300/25 to-blue-400/20 font-semibold tracking-wide text-cyan-100">
+                            {avatarUrl ? (
+                              <img src={avatarUrl} alt={`${name} avatar`} className="h-full w-full object-cover" />
+                            ) : (
+                              initials
+                            )}
+                          </span>
+                          <span className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-cyan-50">{name}</p>
+                            <p className="truncate text-xs text-cyan-100/65">{email}</p>
+                          </span>
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={onAvatarFileChange}
+                        />
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="inline-flex rounded-xl border border-cyan-200/25 bg-slate-900/65 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/90"
+                          >
+                            Upload avatar
+                          </button>
+                          {avatarUrl ? (
+                            <button
+                              type="button"
+                              onClick={removeAvatar}
+                              className="inline-flex rounded-xl border border-cyan-200/25 bg-slate-900/65 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/90"
+                            >
+                              Remove
+                            </button>
+                          ) : null}
+                        </div>
+                        {avatarError ? (
+                          <p className="mt-2 text-xs text-rose-200/95">{avatarError}</p>
+                        ) : null}
                       </div>
                       <div className="mt-3 space-y-2 text-sm text-cyan-100/80">
                         <p>Current workspace: Matrix Console</p>
