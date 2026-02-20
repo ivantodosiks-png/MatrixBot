@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import crypto from "node:crypto";
 import { authOptions } from "@/lib/auth";
-import { findUserById } from "@/lib/user-store";
+import { applyPaidPlanForUser, findUserById } from "@/lib/user-store";
 import { sendReceiptEmail } from "@/lib/smtp-mailer";
 
 export const runtime = "nodejs";
@@ -27,6 +27,10 @@ function maskCardNumber(cardNumber: string) {
   const digits = normalizeDigits(cardNumber);
   const tail = digits.slice(-4) || "0000";
   return `Card **** **** **** ${tail}`;
+}
+
+function toPaidPlan(plan: "pro" | "ultra") {
+  return plan === "pro" ? "PRO" : "ULTRA";
 }
 
 export async function POST(request: Request) {
@@ -93,23 +97,42 @@ export async function POST(request: Request) {
       );
     }
 
+    const paidPlan = toPaidPlan(plan);
+    await applyPaidPlanForUser(user.id, paidPlan);
+
     const amount = planToAmount(plan);
     const receiptId = crypto.randomUUID();
-    await sendReceiptEmail({
-      to: user.email,
-      customerName: cardholderName,
-      planName: plan.toUpperCase(),
-      amountValue: amount,
-      currency: "EUR",
-      paymentMethod: maskCardNumber(cardNumber),
-      receiptId,
-      purchasedAt: new Date(),
-    });
+    let receiptSent = false;
+
+    try {
+      await sendReceiptEmail({
+        to: user.email,
+        customerName: cardholderName,
+        planName: paidPlan,
+        amountValue: amount,
+        currency: "EUR",
+        paymentMethod: maskCardNumber(cardNumber),
+        receiptId,
+        purchasedAt: new Date(),
+      });
+      receiptSent = true;
+    } catch {
+      receiptSent = false;
+    }
+
+    const updatedUser = await findUserById(user.id);
+    const currentPlan = updatedUser?.plan ?? paidPlan;
+    const subscriptionStatus = updatedUser?.subscription_status ?? "ACTIVE";
 
     return NextResponse.json({
       ok: true,
       receiptId,
-      message: "Thank you for your purchase. Receipt sent to your email.",
+      currentPlan,
+      subscriptionStatus,
+      receiptSent,
+      message: receiptSent
+        ? `Payment accepted. Current plan: ${currentPlan}. Receipt sent to your email.`
+        : `Payment accepted. Current plan: ${currentPlan}. Receipt email could not be delivered.`,
     });
   } catch (error) {
     const message =

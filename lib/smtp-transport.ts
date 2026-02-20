@@ -28,6 +28,15 @@ function toBase64(value: string) {
   return Buffer.from(value, "utf8").toString("base64");
 }
 
+function encodeMimeBase64(value: string) {
+  const encoded = Buffer.from(normalizeCrlf(value), "utf8").toString("base64");
+  const lines: string[] = [];
+  for (let index = 0; index < encoded.length; index += 76) {
+    lines.push(encoded.slice(index, index + 76));
+  }
+  return lines.join("\r\n");
+}
+
 function normalizeCrlf(value: string) {
   return value.replace(/\r?\n/g, "\r\n");
 }
@@ -215,15 +224,18 @@ class SmtpConnection {
 }
 
 function buildMime(config: SmtpConfig, message: SmtpMessage) {
-  const recipients = parseRecipients(message.to).map(extractEmailAddress);
+  const recipientInput = parseRecipients(message.to);
+  const recipients = recipientInput.map(extractEmailAddress);
   if (recipients.length === 0) {
     throw new Error("No recipient email provided");
   }
 
   const subject = escapeHeader(message.subject);
   const from = escapeHeader(config.from);
-  const to = recipients.map((item) => escapeHeader(item)).join(", ");
+  const to = recipientInput.map((item) => escapeHeader(item)).join(", ");
   const replyTo = message.replyTo ? escapeHeader(message.replyTo) : "";
+  const date = new Date().toUTCString();
+  const messageId = `<${Date.now().toString(36)}.${Math.random().toString(36).slice(2)}@matrix.local>`;
 
   if (!message.html) {
     return [
@@ -231,11 +243,13 @@ function buildMime(config: SmtpConfig, message: SmtpMessage) {
       `To: ${to}`,
       replyTo ? `Reply-To: ${replyTo}` : "",
       `Subject: ${subject}`,
+      `Date: ${date}`,
+      `Message-ID: ${messageId}`,
       "MIME-Version: 1.0",
       "Content-Type: text/plain; charset=UTF-8",
-      "Content-Transfer-Encoding: 7bit",
+      "Content-Transfer-Encoding: base64",
       "",
-      dotStuff(message.text),
+      dotStuff(encodeMimeBase64(message.text)),
     ]
       .filter(Boolean)
       .join("\r\n");
@@ -247,20 +261,22 @@ function buildMime(config: SmtpConfig, message: SmtpMessage) {
     `To: ${to}`,
     replyTo ? `Reply-To: ${replyTo}` : "",
     `Subject: ${subject}`,
+    `Date: ${date}`,
+    `Message-ID: ${messageId}`,
     "MIME-Version: 1.0",
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
     "",
     `--${boundary}`,
     "Content-Type: text/plain; charset=UTF-8",
-    "Content-Transfer-Encoding: 7bit",
+    "Content-Transfer-Encoding: base64",
     "",
-    dotStuff(message.text),
+    dotStuff(encodeMimeBase64(message.text)),
     "",
     `--${boundary}`,
     "Content-Type: text/html; charset=UTF-8",
-    "Content-Transfer-Encoding: 7bit",
+    "Content-Transfer-Encoding: base64",
     "",
-    dotStuff(message.html),
+    dotStuff(encodeMimeBase64(message.html)),
     "",
     `--${boundary}--`,
   ]

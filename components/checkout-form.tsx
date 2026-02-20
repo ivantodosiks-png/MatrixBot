@@ -12,6 +12,9 @@ type ApiResponse = {
   ok?: boolean;
   message?: string;
   receiptId?: string;
+  currentPlan?: string;
+  subscriptionStatus?: string;
+  receiptSent?: boolean;
   error?: {
     message?: string;
   };
@@ -26,6 +29,8 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [receiptId, setReceiptId] = useState("");
+  const [currentPlan, setCurrentPlan] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState("");
 
   const amountLabel = useMemo(() => {
     if (plan === "pro") return "9.99 EUR / month";
@@ -40,6 +45,8 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
     setPending(true);
     setError("");
     setSuccessMessage("");
+    setCurrentPlan("");
+    setSubscriptionStatus("");
 
     try {
       const response = await fetch("/api/payment/checkout", {
@@ -61,6 +68,8 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
 
       setReceiptId(data.receiptId || "");
       setSuccessMessage(data.message || "Thank you for your purchase");
+      setCurrentPlan(data.currentPlan || "");
+      setSubscriptionStatus(data.subscriptionStatus || "");
       setCardNumber("");
       setExpiry("");
       setCvc("");
@@ -157,6 +166,8 @@ export default function CheckoutForm({ plan, email }: CheckoutFormProps) {
         <p className="checkout-success">
           {successMessage}
           {receiptId ? ` Receipt: ${receiptId}` : ""}
+          {currentPlan ? ` Current plan: ${currentPlan}.` : ""}
+          {subscriptionStatus ? ` Status: ${subscriptionStatus}.` : ""}
         </p>
       ) : null}
     </form>
