@@ -1464,6 +1464,10 @@ body.auth-page {
   margin-top: 12px;
 }
 
+.lp-hero-cta-center {
+  justify-content: center;
+}
+
 .lp-final-cta .lp-btn {
   padding: 9px 13px;
   border-radius: 10px;

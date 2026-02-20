@@ -91,8 +91,17 @@ export default async function HomePage() {
             <span className="lp-online-pill">
               {isLoggedIn ? "Matrix skriver..." : "Core online"}
             </span>
+            {isLoggedIn ? (
+              <a href="/account" className="lp-btn lp-btn-secondary">
+                Account
+              </a>
+            ) : (
+              <a href="/login" className="lp-btn lp-btn-secondary">
+                Logg inn
+              </a>
+            )}
             <a href="/chat" className="lp-btn lp-btn-primary">
-              Start
+              Open chat
             </a>
           </div>
         </div>
@@ -107,9 +116,9 @@ export default async function HomePage() {
               Premium AI workspace with secure flows, low-friction UX, and a
               clean neon visual system built for modern teams.
             </p>
-            <div className="lp-hero-cta">
+            <div className="lp-hero-cta lp-hero-cta-center">
               <a className="lp-btn lp-btn-primary" href="/chat">
-                Start
+                Start with Matrix
               </a>
             </div>
             <div className="lp-metrics">
