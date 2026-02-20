@@ -117,7 +117,7 @@ export default async function HomePage() {
               Matrix assistant focused on programming tasks: code generation,
               fixes, explanations, and fast technical decisions in one place.
             </p>
-            <div className="lp-hero-cta lp-hero-cta-center">
+            <div className="lp-hero-cta">
               <a className="lp-btn lp-btn-primary" href="/chat">
                 {isLoggedIn ? "Open chat" : "Login"}
               </a>
@@ -366,6 +366,41 @@ export default async function HomePage() {
             <h2>Launch your premium Matrix AI experience.</h2>
           </div>
           <div className="lp-final-cta">
+            <a href="#" className="lp-store-badge" aria-label="Get it on Google Play">
+              <span className="lp-store-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <path d="M4 3L14.5 10L4 17V3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="lp-store-text">
+                <small>Get it on</small>
+                <strong>Google Play</strong>
+              </span>
+            </a>
+            <a href="#" className="lp-store-badge" aria-label="Download on the App Store">
+              <span className="lp-store-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <path
+                    d="M12.4 6.4C13 5.7 13.4 4.8 13.3 3.8C12.4 3.9 11.4 4.4 10.8 5.1C10.2 5.7 9.7 6.7 9.8 7.6C10.8 7.7 11.8 7.1 12.4 6.4Z"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9.7 7.8C8.3 7.8 7.1 8.6 6.4 9.8C5.2 11.8 5.6 14.7 7.2 16.8C8 17.8 8.9 18.9 10.1 18.9C11.2 18.9 11.6 18.2 12.9 18.2C14.1 18.2 14.5 18.9 15.6 18.9C16.8 18.9 17.6 17.9 18.4 16.9C19 16.1 19.3 15.3 19.4 15.2C19.4 15.2 17.2 14.3 17.2 11.7C17.2 9.6 18.9 8.7 19 8.6C18.1 7.3 16.7 7.1 16.2 7.1C14.9 7 13.8 7.8 13.1 7.8C12.4 7.8 11.4 7.1 10.2 7.1C10 7.1 9.9 7.1 9.7 7.8Z"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="lp-store-text">
+                <small>Download on the</small>
+                <strong>App Store</strong>
+              </span>
+            </a>
             <a href="/chat" className="lp-btn lp-btn-primary">
               Start
             </a>

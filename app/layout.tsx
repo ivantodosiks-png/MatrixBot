@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SmoothScrollProvider from "@/components/SmoothScrollProvider";
 
 export const metadata: Metadata = {
   title: "Matrix GPT",
@@ -14,10 +15,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="ambient-layer ambient-particles" aria-hidden="true" />
-        <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
-        <div className="ambient-layer ambient-rain" aria-hidden="true" />
-        {children}
+        <SmoothScrollProvider
+          lerp={0.09}
+          wheelMultiplier={1}
+          touchMultiplier={1}
+          smoothWheel
+          smoothTouch
+        >
+          <div className="ambient-layer ambient-particles" aria-hidden="true" />
+          <div className="ambient-layer ambient-glowdots" aria-hidden="true" />
+          <div className="ambient-layer ambient-rain" aria-hidden="true" />
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );

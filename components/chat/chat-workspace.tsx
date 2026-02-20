@@ -237,7 +237,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
   }, [activeConversationId, conversations, hydrated]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [activeConversation?.messages.length, isPending]);
 
   const handleSelectConversation = (id: string) => {
@@ -552,6 +552,12 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
             </div>
 
             <Link
+              href="/"
+              className="hidden rounded-xl border border-cyan-200/25 bg-slate-900/55 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/80 md:inline-flex"
+            >
+              Home
+            </Link>
+            <Link
               href="/pricing"
               className="hidden rounded-xl border border-cyan-200/25 bg-slate-900/55 px-3 py-2 text-xs font-medium text-cyan-100 transition hover:border-cyan-200/45 hover:bg-slate-900/80 md:inline-flex"
             >
@@ -630,7 +636,7 @@ export default function ChatWorkspace({ userName, userEmail }: ChatWorkspaceProp
                         M
                       </div>
                       <div className="inline-flex items-center gap-2 rounded-2xl border border-cyan-100/18 bg-slate-900/62 px-4 py-3">
-                        <span className="text-xs text-cyan-100/72">Matrix skriver...</span>
+                        <span className="text-xs text-cyan-100/72">Matrix typing...</span>
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80 [animation-delay:-0.18s]" />
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80 [animation-delay:-0.06s]" />
                         <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-cyan-200/80" />

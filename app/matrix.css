@@ -19,7 +19,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 * { box-sizing: border-box; }
@@ -939,7 +939,7 @@ body.chat-page {
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overscroll-behavior: contain;
   background: linear-gradient(180deg, rgba(18, 33, 55, 0.2) 0%, rgba(16, 28, 47, 0.38) 100%);
   scrollbar-width: none;
@@ -1474,6 +1474,61 @@ body.auth-page {
   font-size: 0.84rem;
   min-width: 126px;
   flex: 0 0 auto;
+}
+
+.lp-store-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 178px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(132, 200, 255, 0.45);
+  background: linear-gradient(145deg, rgba(26, 46, 72, 0.72), rgba(18, 33, 55, 0.74));
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
+  color: #e9f7ff;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lp-store-badge:hover {
+  transform: translateY(-2px);
+  border-color: rgba(147, 225, 255, 0.72);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.28), 0 0 18px rgba(107, 233, 255, 0.18);
+}
+
+.lp-store-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border: 1px solid rgba(142, 216, 255, 0.42);
+  background: rgba(19, 38, 62, 0.74);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #bce9ff;
+}
+
+.lp-store-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.lp-store-text {
+  display: grid;
+  line-height: 1.15;
+}
+
+.lp-store-text small {
+  font-size: 0.64rem;
+  color: #b7d4ef;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lp-store-text strong {
+  font-size: 0.84rem;
+  font-family: "Sora", "Inter", sans-serif;
+  color: #f2fbff;
 }
 
 .lp-btn {
