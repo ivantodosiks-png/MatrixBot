@@ -1838,6 +1838,32 @@ body.auth-page {
   transform: translateY(0);
 }
 
+.lp-scroll-block.reveal-on-scroll {
+  --section-shift-x: 0px;
+  --section-shift-y: 26px;
+  transform: translate3d(var(--section-shift-x), var(--section-shift-y), 0) scale(0.988);
+  will-change: transform, opacity;
+}
+
+.lp-scroll-block.from-left {
+  --section-shift-x: -42px;
+  --section-shift-y: 20px;
+}
+
+.lp-scroll-block.from-right {
+  --section-shift-x: 42px;
+  --section-shift-y: 20px;
+}
+
+.lp-scroll-block.from-up {
+  --section-shift-x: 0px;
+  --section-shift-y: 34px;
+}
+
+.lp-scroll-block.reveal-on-scroll.is-visible {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
 @keyframes lp-pulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.25); opacity: 0.75; }
@@ -2432,6 +2458,11 @@ select {
   .lp-step,
   .lp-showcase-card {
     animation-duration: 7s;
+  }
+  .lp-scroll-block.from-left,
+  .lp-scroll-block.from-right {
+    --section-shift-x: 0px;
+    --section-shift-y: 24px;
   }
   .lp-scroll-pod-body {
     transform: scale(0.76);

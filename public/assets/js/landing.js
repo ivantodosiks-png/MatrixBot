@@ -1,38 +1,44 @@
 (function () {
-  const items = Array.from(document.querySelectorAll('.reveal-on-scroll'));
-  if (!items.length) return;
-
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReduced) {
-    items.forEach((el) => el.classList.add('is-visible'));
-    return;
-  }
-
-  if (!('IntersectionObserver' in window)) {
-    items.forEach((el) => el.classList.add('is-visible'));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    },
-    {
-      threshold: 0.12,
-      rootMargin: '0px 0px -8% 0px'
-    }
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const sectionBlocks = Array.from(
+    document.querySelectorAll('.lp-band, .lp-section, .lp-showcase, .lp-final, .lp-footer')
   );
-
-  items.forEach((el, index) => {
-    el.style.transitionDelay = `${Math.min(index * 35, 210)}ms`;
-    el.style.transitionDuration = '680ms';
-    el.style.transitionTimingFunction = 'cubic-bezier(0.2, 0.7, 0.25, 1)';
-    observer.observe(el);
+  const sectionDirections = ['from-left', 'from-right', 'from-up'];
+  sectionBlocks.forEach((el, index) => {
+    el.classList.add('lp-scroll-block', sectionDirections[index % sectionDirections.length]);
+    if (!el.classList.contains('reveal-on-scroll')) {
+      el.classList.add('reveal-on-scroll');
+    }
   });
+
+  const items = Array.from(document.querySelectorAll('.reveal-on-scroll'));
+  if (items.length) {
+    if (prefersReduced || !('IntersectionObserver' in window)) {
+      items.forEach((el) => el.classList.add('is-visible'));
+    } else {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        },
+        {
+          threshold: 0.11,
+          rootMargin: '0px 0px -6% 0px'
+        }
+      );
+
+      items.forEach((el, index) => {
+        el.style.transitionDelay = `${Math.min(index * 28, 190)}ms`;
+        el.style.transitionDuration = '720ms';
+        el.style.transitionTimingFunction = 'cubic-bezier(0.2, 0.7, 0.25, 1)';
+        observer.observe(el);
+      });
+    }
+  }
 
   const tiltTargets = Array.from(
     document.querySelectorAll('.lp-terminal, .lp-showcase-card')
@@ -62,8 +68,6 @@
   const heroSection = document.querySelector('.lp-hero');
   const featuresSection = document.getElementById('features');
   const howSection = document.getElementById('how');
-
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
   const easeInOutCubic = (value) =>
     value < 0.5
       ? 4 * value * value * value
@@ -160,5 +164,108 @@
     window.addEventListener('scroll', requestFrame, { passive: true });
     window.addEventListener('resize', measureFlightWindow);
     measureFlightWindow();
+  }
+
+  const canUseSmoothScroll =
+    !prefersReduced &&
+    window.matchMedia('(pointer:fine)').matches &&
+    (navigator.maxTouchPoints || 0) === 0;
+
+  if (canUseSmoothScroll) {
+    const root = document.documentElement;
+    root.style.scrollBehavior = 'auto';
+
+    const smooth = {
+      current: window.scrollY,
+      target: window.scrollY,
+      raf: 0,
+      syncing: false
+    };
+
+    const maxScrollTop = () =>
+      Math.max(0, root.scrollHeight - window.innerHeight);
+
+    function animateScroll() {
+      smooth.raf = 0;
+      const delta = smooth.target - smooth.current;
+      smooth.current += delta * 0.12;
+      if (Math.abs(delta) < 0.2) {
+        smooth.current = smooth.target;
+      }
+
+      smooth.syncing = true;
+      window.scrollTo(0, smooth.current);
+      smooth.syncing = false;
+
+      if (Math.abs(smooth.target - smooth.current) > 0.2) {
+        smooth.raf = window.requestAnimationFrame(animateScroll);
+      }
+    }
+
+    function queueScroll() {
+      if (smooth.raf) return;
+      smooth.raf = window.requestAnimationFrame(animateScroll);
+    }
+
+    window.addEventListener(
+      'wheel',
+      (event) => {
+        if (event.ctrlKey) return;
+        event.preventDefault();
+        smooth.target = clamp(
+          smooth.target + event.deltaY,
+          0,
+          maxScrollTop()
+        );
+        queueScroll();
+      },
+      { passive: false }
+    );
+
+    window.addEventListener('keydown', (event) => {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
+
+      const target = event.target;
+      if (target && target instanceof HTMLElement) {
+        const tag = target.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      }
+
+      const pageStep = window.innerHeight * 0.82;
+      let delta = 0;
+
+      if (event.key === 'ArrowDown') delta = 120;
+      else if (event.key === 'ArrowUp') delta = -120;
+      else if (event.key === 'PageDown' || event.key === ' ') delta = pageStep;
+      else if (event.key === 'PageUp') delta = -pageStep;
+      else if (event.key === 'Home') delta = -Number.MAX_SAFE_INTEGER;
+      else if (event.key === 'End') delta = Number.MAX_SAFE_INTEGER;
+      else return;
+
+      event.preventDefault();
+      if (Math.abs(delta) > 1000000) {
+        smooth.target = delta < 0 ? 0 : maxScrollTop();
+      } else {
+        smooth.target = clamp(smooth.target + delta, 0, maxScrollTop());
+      }
+      queueScroll();
+    });
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (smooth.syncing) return;
+        smooth.current = window.scrollY;
+        smooth.target = window.scrollY;
+      },
+      { passive: true }
+    );
+
+    window.addEventListener('resize', () => {
+      smooth.current = clamp(window.scrollY, 0, maxScrollTop());
+      smooth.target = clamp(smooth.target, 0, maxScrollTop());
+    });
   }
 })();
