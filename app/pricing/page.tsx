@@ -34,7 +34,6 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
             <a href="/">Home</a>
             <a href="/chat">Chat</a>
             <a href="/pricing">Subscriptions</a>
-            <a href="/account">Account</a>
           </nav>
         </header>
 

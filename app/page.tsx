@@ -93,12 +93,12 @@ export default async function HomePage() {
               Matrix online
             </span>
             {isLoggedIn ? (
-              <a href="/account" className="lp-btn lp-btn-secondary">
-                Account
+              <a href="/pricing" className="lp-btn lp-btn-secondary">
+                Subscriptions
               </a>
             ) : (
               <a href="/login" className="lp-btn lp-btn-secondary">
-                Logg inn
+                Log in
               </a>
             )}
             <a href="/chat" className="lp-btn lp-btn-primary">

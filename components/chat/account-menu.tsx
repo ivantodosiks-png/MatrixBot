@@ -143,9 +143,7 @@ export default function AccountMenu({ name, email }: AccountMenuProps) {
                       type="button"
                       onClick={() => signOut({ callbackUrl: "/login" })}
                       className={`mt-1 flex w-full items-center rounded-xl px-3 py-2.5 text-left transition ${
-                        focus
-                          ? "bg-rose-500/20 text-rose-100"
-                          : "text-rose-200/95"
+                        focus ? "bg-cyan-400/15 text-cyan-100" : "text-cyan-50/90"
                       }`}
                     >
                       Logout

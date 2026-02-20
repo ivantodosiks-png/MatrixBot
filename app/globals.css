@@ -5,3 +5,17 @@
 body {
   margin: 0;
 }
+
+/* Hide the browser scrollbar on the main page while preserving scroll */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}

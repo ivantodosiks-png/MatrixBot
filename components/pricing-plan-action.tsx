@@ -45,7 +45,7 @@ export default function PricingPlanAction(props: PricingPlanActionProps) {
         if (!response.ok) {
           throw new Error(data.error?.message || `HTTP ${response.status}`);
         }
-        window.location.href = "/account?plan=free";
+        window.location.href = "/pricing";
         return;
       }
 
