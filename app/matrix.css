@@ -675,6 +675,20 @@ body.chat-page {
   padding: 18px;
 }
 
+.chat-page .chat-loader-brand {
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+}
+
+.chat-page .chat-loader-logo {
+  width: min(180px, 62vw);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(107, 233, 255, 0.34));
+  animation: logo-float-soft 4.8s ease-in-out infinite;
+}
+
 .chat-page .chat-loader-title {
   font-family: "Sora", "Inter", sans-serif;
   font-size: 0.92rem;
@@ -751,8 +765,31 @@ body.chat-page {
 }
 
 .chat-page .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: "Sora", "Inter", sans-serif;
   letter-spacing: 2px;
+}
+
+.chat-page .brand-logo-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  border: 1px solid rgba(126, 203, 255, 0.4);
+  background: linear-gradient(158deg, rgba(24, 46, 75, 0.84), rgba(16, 33, 56, 0.8));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.chat-page .brand-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(108, 233, 255, 0.4));
+  animation: logo-float-soft 5.6s ease-in-out infinite;
 }
 
 .user-card {
@@ -1179,6 +1216,16 @@ body.chat-page {
   }
 }
 
+@keyframes logo-float-soft {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
 @media (max-width: 860px) {
   .chat-page .app {
     grid-template-columns: 1fr;
@@ -1235,10 +1282,21 @@ body.auth-page {
 }
 
 .auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: "Sora", "Inter", sans-serif;
   letter-spacing: 3px;
   color: var(--accent);
   margin-bottom: 8px;
+}
+
+.auth-logo-mark {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(108, 233, 255, 0.4));
+  animation: logo-float-soft 4.9s ease-in-out infinite;
 }
 
 .auth-title {
@@ -1403,10 +1461,37 @@ body.auth-page {
 }
 
 .lp-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: "Sora", "Inter", sans-serif;
   letter-spacing: 2px;
   font-size: 1.2rem;
   color: #d9eeff;
+}
+
+.lp-logo-mark-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(123, 204, 255, 0.4);
+  background: linear-gradient(160deg, rgba(18, 37, 61, 0.88), rgba(13, 28, 48, 0.78));
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24), inset 0 0 0 1px rgba(174, 226, 255, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-logo-mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(108, 233, 255, 0.4));
+  animation: logo-float-soft 5.2s ease-in-out infinite;
+}
+
+.lp-logo-text {
+  letter-spacing: 0.12em;
 }
 
 .lp-nav {
@@ -1810,6 +1895,19 @@ body.auth-page {
   font-size: 0.9rem;
 }
 
+.lp-footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-footer-brand-mark {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 9px rgba(108, 233, 255, 0.3));
+}
+
 .lp-footer-links {
   display: flex;
   gap: 14px;
@@ -1924,6 +2022,10 @@ body.auth-page {
   .lp-card,
   .lp-step,
   .lp-line .pulse,
+  .lp-logo-mark,
+  .auth-logo-mark,
+  .chat-page .brand-logo,
+  .chat-page .chat-loader-logo,
   .ambient-layer,
   .lp-aurora i,
   .lp-band-track,
@@ -2860,6 +2962,3 @@ body.matrix-exit-page::after {
     transform: translateY(8%);
   }
 }
-
-
-

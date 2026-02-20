@@ -30,7 +30,14 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
       <main className="pricing-shell">
         <header className="pricing-header reveal-on-scroll">
           <a className="lp-logo" href="/">
-            MATRIX GPT
+            <span className="lp-logo-mark-wrap" aria-hidden="true">
+              <img
+                src="/assets/img/brand/logo-icon-primary.png"
+                alt=""
+                className="lp-logo-mark"
+              />
+            </span>
+            <span className="lp-logo-text">MATRIX GPT</span>
           </a>
           <nav className="lp-nav" aria-label="Pricing navigation">
             <a href="/">Home</a>

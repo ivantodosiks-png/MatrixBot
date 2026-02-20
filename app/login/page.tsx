@@ -76,7 +76,14 @@ export default function LoginPage() {
 
       <main className="auth-shell">
         <section className="auth-panel">
-          <div className="auth-logo">MATRIX GPT</div>
+          <div className="auth-logo">
+            <img
+              src="/assets/img/brand/logo-icon-primary.png"
+              alt=""
+              className="auth-logo-mark"
+            />
+            <span>MATRIX GPT</span>
+          </div>
           <div className="auth-title">Login</div>
           <p className="auth-sub">Sign in to your account to continue to chat.</p>
 

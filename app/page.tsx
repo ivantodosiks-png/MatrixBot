@@ -26,7 +26,14 @@ export default async function HomePage() {
       <header className="lp-header">
         <div className="lp-shell">
           <a className="lp-logo" href="/">
-            MATRIX GPT
+            <span className="lp-logo-mark-wrap" aria-hidden="true">
+              <img
+                src="/assets/img/brand/logo-icon-primary.png"
+                alt=""
+                className="lp-logo-mark"
+              />
+            </span>
+            <span className="lp-logo-text">MATRIX GPT</span>
           </a>
           <nav className="lp-nav" aria-label="Main navigation">
             <a href="#stats">Stats</a>
@@ -314,7 +321,14 @@ export default async function HomePage() {
 
       <footer className="lp-footer">
         <div className="lp-shell lp-footer-row">
-          <div>(c) Matrix GPT</div>
+          <div className="lp-footer-brand">
+            <img
+              src="/assets/img/brand/logo-monogram.png"
+              alt=""
+              className="lp-footer-brand-mark"
+            />
+            <span>(c) Matrix GPT</span>
+          </div>
           <div className="lp-footer-links">
             <a href="/login">Logg inn</a>
             <a href="/register">Registrer</a>

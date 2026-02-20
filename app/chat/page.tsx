@@ -18,6 +18,13 @@ export default function ChatPage() {
       <div className="app">
         <div className="chat-loader" id="chatLoader" aria-live="polite">
           <div className="chat-loader-panel">
+            <div className="chat-loader-brand" aria-hidden="true">
+              <img
+                src="/assets/img/brand/logo-cube-hero.png"
+                alt=""
+                className="chat-loader-logo"
+              />
+            </div>
             <div className="chat-loader-title">Initializing matrix chat</div>
             <div className="chat-loader-line" />
             <div className="chat-loader-line short" />
@@ -31,7 +38,16 @@ export default function ChatPage() {
 
         <aside className="sidebar" id="sidebar">
           <div className="sidebar-header">
-            <div className="brand">MATRIX GPT</div>
+            <div className="brand">
+              <span className="brand-logo-wrap" aria-hidden="true">
+                <img
+                  src="/assets/img/brand/logo-icon-primary.png"
+                  alt=""
+                  className="brand-logo"
+                />
+              </span>
+              <span>MATRIX GPT</span>
+            </div>
             <button className="btn tiny" id="newChatBtn">
               Ny chat
             </button>
