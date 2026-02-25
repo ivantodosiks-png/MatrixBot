@@ -1486,6 +1486,21 @@ body.auth-page {
   line-height: 1.55;
 }
 
+.lp-compat-notice-text {
+  display: grid;
+  gap: 9px;
+}
+
+.lp-compat-notice-text span {
+  display: block;
+  text-wrap: pretty;
+}
+
+.lp-compat-notice-text span:first-child {
+  color: #e8f8ff;
+  font-weight: 600;
+}
+
 .lp-compat-notice-icon-close {
   position: absolute;
   top: 12px;

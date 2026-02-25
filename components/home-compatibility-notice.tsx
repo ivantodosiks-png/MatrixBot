@@ -59,12 +59,16 @@ export default function HomeCompatibilityNotice() {
           Close
         </button>
         <h2 id="lpCompatNoticeTitle">Compatibility notice</h2>
-        <p id="lpCompatNoticeText">
-          Thanks for visiting. Because browsers, operating systems, and device
-          types (desktop, tablet, mobile) can behave differently, you may
-          occasionally notice minor visual or functional inconsistencies. If
-          something does not work as expected, please update your browser or
-          try another modern browser for the best experience.
+        <p id="lpCompatNoticeText" className="lp-compat-notice-text">
+          <span>Thanks for visiting Matrix GPT.</span>
+          <span>
+            Browsers, operating systems, and device types (desktop, tablet,
+            mobile) can behave a little differently.
+          </span>
+          <span>
+            If something looks or works off, please update your browser or try
+            another modern browser for the best experience.
+          </span>
         </p>
         <button type="button" className="lp-compat-notice-close" onClick={closeNotice}>
           Got it
