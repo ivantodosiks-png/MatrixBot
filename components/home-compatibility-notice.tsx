@@ -41,17 +41,35 @@ export default function HomeCompatibilityNotice() {
   if (!visible) return null;
 
   return (
-    <div className="lp-compat-notice" role="status" aria-live="polite">
-      <p>
-        Thanks for visiting. Because browsers, operating systems, and device
-        types (desktop, tablet, mobile) can behave differently, you may
-        occasionally notice minor visual or functional inconsistencies. If
-        something does not work as expected, please update your browser or try
-        another modern browser for the best experience.
-      </p>
-      <button type="button" className="lp-compat-notice-close" onClick={closeNotice}>
-        Got it
-      </button>
+    <div className="lp-compat-notice-backdrop" onClick={closeNotice}>
+      <section
+        className="lp-compat-notice"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="lpCompatNoticeTitle"
+        aria-describedby="lpCompatNoticeText"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="lp-compat-notice-icon-close"
+          onClick={closeNotice}
+          aria-label="Close compatibility notice"
+        >
+          Close
+        </button>
+        <h2 id="lpCompatNoticeTitle">Compatibility notice</h2>
+        <p id="lpCompatNoticeText">
+          Thanks for visiting. Because browsers, operating systems, and device
+          types (desktop, tablet, mobile) can behave differently, you may
+          occasionally notice minor visual or functional inconsistencies. If
+          something does not work as expected, please update your browser or
+          try another modern browser for the best experience.
+        </p>
+        <button type="button" className="lp-compat-notice-close" onClick={closeNotice}>
+          Got it
+        </button>
+      </section>
     </div>
   );
 }
