@@ -1444,6 +1444,60 @@ body.auth-page {
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
 }
 
+.lp-compat-notice {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1400;
+  width: min(980px, calc(100vw - 28px));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(122, 205, 255, 0.44);
+  background: linear-gradient(145deg, rgba(22, 40, 66, 0.94), rgba(15, 31, 52, 0.9));
+  box-shadow: 0 18px 42px rgba(4, 11, 22, 0.48);
+  backdrop-filter: blur(8px);
+  animation: page-enter-soft 240ms cubic-bezier(0.22, 0.8, 0.2, 1) both;
+}
+
+.lp-compat-notice p {
+  margin: 0;
+  color: #d6ecff;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.lp-compat-notice-close {
+  appearance: none;
+  border: 1px solid rgba(139, 225, 255, 0.55);
+  border-radius: 10px;
+  background: linear-gradient(145deg, rgba(103, 234, 255, 0.2), rgba(98, 234, 255, 0.1));
+  color: #e9fcff;
+  font-family: "Sora", "Inter", sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.lp-compat-notice-close:hover {
+  transform: translateY(-1px);
+  border-color: rgba(153, 235, 255, 0.84);
+  background: linear-gradient(145deg, rgba(123, 239, 255, 0.26), rgba(103, 231, 255, 0.16));
+}
+
+.lp-compat-notice-close:focus-visible {
+  outline: 2px solid rgba(139, 225, 255, 0.78);
+  outline-offset: 2px;
+}
+
 .lp-logo {
   display: inline-flex;
   align-items: center;
@@ -2579,6 +2633,23 @@ select {
 }
 
 @media (max-width: 760px) {
+  .lp-compat-notice {
+    top: 10px;
+    width: calc(100vw - 18px);
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 11px 12px;
+  }
+
+  .lp-compat-notice p {
+    font-size: 0.84rem;
+  }
+
+  .lp-compat-notice-close {
+    width: 100%;
+    text-align: center;
+  }
+
   .lp-band-marquee {
     animation-duration: 22s;
   }

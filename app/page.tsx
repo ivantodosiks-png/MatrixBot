@@ -2,6 +2,7 @@
 import Script from "next/script";
 import { getServerSession } from "next-auth";
 import BodyClass from "@/components/body-class";
+import HomeCompatibilityNotice from "@/components/home-compatibility-notice";
 import { getPublicStats } from "@/lib/stats";
 import { authOptions } from "@/lib/auth";
 
@@ -21,6 +22,7 @@ export default async function HomePage() {
   return (
     <>
       <BodyClass classes="matrix landing" />
+      <HomeCompatibilityNotice />
 
       <div className="bg-grid" aria-hidden="true" />
       <div className="bg-rain" aria-hidden="true" />
